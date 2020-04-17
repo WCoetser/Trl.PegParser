@@ -1,0 +1,10 @@
+Trs.PegParser/bin/
+Trs.PegParser/obj/
+Trs.PegParser.Tests/bin/
+Trs.PegParser.Tests/obj/
+.vs/
+.vscode/launch.json
+.vscode/tasks.json
+nupkg/
+Trs.PegParser.Tests/TestResults/
+UnitTestCoverageReport/
