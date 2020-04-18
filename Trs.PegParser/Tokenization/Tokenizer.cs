@@ -17,10 +17,12 @@ namespace Trs.PegParser.Tokenization
         /// <returns>The result of tokenization. Tokens are assaigned names from <see cref="TTokenName"/></returns>
         public TokenizationResult<TTokenName> Tokenize(string inputString, 
             IEnumerable<TokenDefinition<TTokenName>> prioritizedTokenDefinitions)
-        {
+        {            
+            _ = inputString ?? throw new ArgumentException("Expected input string", nameof(inputString));
+
             if (prioritizedTokenDefinitions == null || !prioritizedTokenDefinitions.Any())
             {
-                throw new ArgumentException(nameof(prioritizedTokenDefinitions));
+                throw new ArgumentException("Expected at least one token definition.", nameof(prioritizedTokenDefinitions));
             }
 
             var matches = GetMatches(inputString, prioritizedTokenDefinitions);

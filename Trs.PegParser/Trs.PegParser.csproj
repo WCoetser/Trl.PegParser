@@ -2,8 +2,38 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 	  <Nullable>Enable</Nullable>
+
+    <!-- BEGIN NUGET METADATA -->
+
+    <PackageId>Trs.PegParser</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Wikus Coetser</Authors>
+    <Company></Company>
+    <Title>Tokenizer And PEG Parser</Title>
+    <PackageDescription>NB: THIS IS PRE-RELEASE SOFTWARE. Tokenizer And PEG Parser is what it says. It uses regular expressions to tokenize a string, and also makes parsing expression grammers available for parsing and interpreting.</PackageDescription>
+    <Description>NB: THIS IS PRE-RELEASE SOFTWARE. Tokenizer And PEG Parser is what it says. It uses regular expressions to tokenize a string, and also makes parsing expression grammers available for parsing and interpreting.</Description>
+    <Copyright>Wikus Coetser, 2020, MIT Licence</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- TODO: - <PackageReleaseNotes></PackageReleaseNotes>-->
+    <!-- <IncludeSource>True</IncludeSource> -->
+    <IsTool>False</IsTool>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/WCoetser/Trs.PegParser</RepositoryUrl>
+    <RepositoryBranch>master</RepositoryBranch>
+    <!-- TODO: <MinClientVersion></MinClientVersion>-->
+    <tags>Tokenizer PEG Grammer Regular_Expressions Regex</tags>
+    <PackageTags>Tokenizer PEG Grammer Regular_Expressions Regex</PackageTags>
+    <PackageProjectUrl>https://github.com/WCoetser/Trs.PegParser</PackageProjectUrl>
+    <PackageReleaseNotes>NB: THIS IS PRE-RELEASE SOFTWARE. Tokenizer And PEG Parser is what it says. It uses regular expressions to tokenize a string, and also makes parsing expression grammers available for parsing and interpreting.</PackageReleaseNotes>
+  
+    <!-- END NUGET METADATA -->
+  
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <Folder Include="Grammer\" />
   </ItemGroup>
 </Project>

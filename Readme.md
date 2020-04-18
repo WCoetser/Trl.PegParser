@@ -10,4 +10,4 @@ Unit tests can be run using the `.\test.ps1` script. This will generate a code c
 
 # Licence
 
-Integer Mapper is released under the MIT open source licence. See LICENCE.txt in this repository for the full text.
+Trs.PegParser is released under the MIT open source licence. See LICENCE.txt in this repository for the full text.
