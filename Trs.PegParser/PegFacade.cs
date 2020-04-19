@@ -30,7 +30,7 @@ namespace Trs.PegParser
             StringBuilder sb = new StringBuilder();
             for (int i = matchedTokenRange.StartIndex; i < matchedTokenRange.Length; i++)
             {
-                var substringRange = inputTokens[matchedTokenRange.StartIndex].MatchedCharacterRange;
+                var substringRange = inputTokens[i].MatchedCharacterRange;
                 sb.Append(inputString.Substring(substringRange.StartIndex, substringRange.Length));
             }
             return sb.ToString();
