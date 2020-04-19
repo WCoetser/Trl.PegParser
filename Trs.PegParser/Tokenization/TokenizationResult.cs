@@ -6,13 +6,13 @@ namespace Trs.PegParser.Tokenization
     public class TokenizationResult<TTokenName>
         where TTokenName : Enum
     {
-        public bool Succeeded { get => UnmatchedRanges.Count == 0; }
+        public bool Succeed { get => UnmatchedRanges.Count == 0; }
 
-        public IReadOnlyList<StringMatchRange> UnmatchedRanges { get; }
+        public IReadOnlyList<MatchRange> UnmatchedRanges { get; }
 
         public IReadOnlyList<TokenMatch<TTokenName>> MatchedRanges { get; }
 
-        internal TokenizationResult(IReadOnlyList<TokenMatch<TTokenName>> matchedRanges, IReadOnlyList<StringMatchRange> unmatchedRanges)
+        internal TokenizationResult(IReadOnlyList<TokenMatch<TTokenName>> matchedRanges, IReadOnlyList<MatchRange> unmatchedRanges)
             => (UnmatchedRanges, MatchedRanges) = (unmatchedRanges, matchedRanges);
     }
 }

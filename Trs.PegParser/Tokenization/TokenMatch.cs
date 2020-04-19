@@ -10,9 +10,9 @@ namespace Trs.PegParser.Tokenization
         /// </summary>
         public TTokenName TokenName { get; }
         
-        public StringMatchRange MatchedCharacterRange { get;  }
+        public MatchRange MatchedCharacterRange { get;  }
 
-        internal TokenMatch(TTokenName name, StringMatchRange matchedCharacterRange)
-            => (TokenName, MatchedCharacterRange) = (name, matchedCharacterRange);        
+        internal TokenMatch(TTokenName name, MatchRange matchedCharacterRange)
+            => (TokenName, MatchedCharacterRange) = (name, matchedCharacterRange);
     }
 }

@@ -2,15 +2,15 @@
 
 namespace Trs.PegParser.Tests
 {
-    public class StringMatchRangeTests
+    public class MatchRangeTests
     {
 
         [Fact]
         public void ShouldImplementNotEqualsOperator()
         {
             // Arrange
-            var lhs = new StringMatchRange(1, 2);
-            var rhs = new StringMatchRange(2, 3);
+            var lhs = new MatchRange(1, 2);
+            var rhs = new MatchRange(2, 3);
 
             // Act
             var result = lhs != rhs;
@@ -23,8 +23,8 @@ namespace Trs.PegParser.Tests
         public void ShouldImplementHashingAndEquality()
         {
             // Arrange
-            var lhs = new StringMatchRange(1, 2);
-            var rhs = new StringMatchRange(1, 2);
+            var lhs = new MatchRange(1, 2);
+            var rhs = new MatchRange(1, 2);
 
             // Act
             var lhsHash = lhs.GetHashCode();
