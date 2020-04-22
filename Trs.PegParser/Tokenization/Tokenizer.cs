@@ -67,7 +67,8 @@ namespace Trs.PegParser.Tokenization
             return mismatches;
         }
 
-        private static SortedDictionary<int, TokenMatch<TTokenName>> GetMatches(string inputString, IEnumerable<TokenDefinition<TTokenName>> prioritizedTokenDefinitions)
+        private static SortedDictionary<int, TokenMatch<TTokenName>> GetMatches(string inputString, 
+            IEnumerable<TokenDefinition<TTokenName>> prioritizedTokenDefinitions)
         {
             var orderedMatches = new SortedDictionary<int, TokenMatch<TTokenName>>(); // mapping from match start index to match
             foreach (var definition in prioritizedTokenDefinitions)
@@ -78,7 +79,8 @@ namespace Trs.PegParser.Tokenization
                     // Contains check in case a higher priority regex/token def has been matched before this one
                     if (match.Success && !orderedMatches.ContainsKey(match.Index))
                     {
-                        var tokenMatch = new TokenMatch<TTokenName>(definition.Name, new MatchRange(match.Index, match.Length));
+                        var tokenMatch = new TokenMatch<TTokenName>(definition.Name, 
+                            new MatchRange(match.Index, match.Length), inputString);
                         orderedMatches.Add(match.Index, tokenMatch);
                     }
                 }

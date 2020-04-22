@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Trs.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -12,34 +13,38 @@ namespace Trs.PegParser.Tests
             var inputString = "aaa";
             
             // Arrange ... Store values for assert
-            MatchRange? matchedTokenRangeAssert = null;
-            string[] subActionResults = Array.Empty<string>();
+            IEnumerable<string> subActionResults = Array.Empty<string>();
 
             // Arrange ... Set up parser
             var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            var extractValue = peg.SemanticAction((matchedTokenRange, inputTokens, subResults) =>
+            var extractValue = peg.SemanticAction((tokensMatch, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
-                matchedTokenRangeAssert = matchedTokenRange;
                 subActionResults = subResults;
-                return peg.GetStringValue(matchedTokenRange, inputTokens, inputString);
+                return tokensMatch.GetMatchedString();
             });
-            var parser = peg.Parser(ParsingRuleNames.MatchA, new[] { 
-                peg.Rule(ParsingRuleNames.MatchA, peg.Terminal(TokenNames.A, extractValue)),
+            var parser = peg.Parser(ParsingRuleNames.TerminalTest, new[] { 
+                peg.Rule(ParsingRuleNames.TerminalTest, peg.Terminal(TokenNames.A, extractValue)),
             });
 
             // Act
-            var tokens = tokenizer.Tokenize(inputString);
-            if (!tokens.Succeed) throw new Exception();
-            var parseResult = parser.Parse(tokens.MatchedRanges);
+            var tokensResult = tokenizer.Tokenize(inputString);
+            if (!tokensResult.Succeed) throw new Exception();
+            var parseResult = parser.Parse(tokensResult);
 
             // Assert
-            Assert.Equal(new MatchRange(0, 1), matchedTokenRangeAssert);
+            Assert.Equal(new MatchRange(0, 1), parseResult.MatchedRange);
             Assert.Null(subActionResults);
             Assert.True(parseResult.Succeed);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
             Assert.Equal(1, parseResult.NextParsePosition);
+        }
+
+        [Fact]
+        public void ShouldReturnNonTerminalNamesForValidationChecks()
+        {
+            throw new NotImplementedException();
         }
     }
 }

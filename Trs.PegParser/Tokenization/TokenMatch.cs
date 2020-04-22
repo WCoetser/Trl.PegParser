@@ -12,7 +12,16 @@ namespace Trs.PegParser.Tokenization
         
         public MatchRange MatchedCharacterRange { get;  }
 
-        internal TokenMatch(TTokenName name, MatchRange matchedCharacterRange)
-            => (TokenName, MatchedCharacterRange) = (name, matchedCharacterRange);
+        public string InputString { get; }
+
+        internal TokenMatch(TTokenName name, MatchRange matchedCharacterRange, string inputString)
+            => (TokenName, MatchedCharacterRange, InputString) = (name, matchedCharacterRange, inputString);
+
+        public string GetMatchedString()
+            => MatchedCharacterRange.Length switch
+            {
+                0 => string.Empty,
+                _ => InputString.Substring(MatchedCharacterRange.StartIndex, MatchedCharacterRange.Length)
+            };
     }
 }

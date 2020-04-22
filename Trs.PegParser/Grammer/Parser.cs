@@ -51,11 +51,20 @@ namespace Trs.PegParser.Grammer
             }
         }
 
-        public ParseResult<TSemanticActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens)
+        public ParseResult<TSemanticActionResult> Parse(TokenizationResult<TTokenTypeName> inputTokens)
         {
-            var parseResult = _grammerRules[_startSymbol].Parse(inputTokens, 0);
+            if (!inputTokens.Succeed)
+            {
+                return new ParseResult<TSemanticActionResult>
+                {
+                    NextParsePosition = 0,
+                    Succeed = false
+                };
+            }
+
+            var parseResult = _grammerRules[_startSymbol].Parse(inputTokens.MatchedRanges, 0);
             // Test for extra input at end of input
-            if (parseResult.Succeed && parseResult.NextParsePosition != inputTokens.Count)
+            if (parseResult.Succeed && parseResult.NextParsePosition != inputTokens.MatchedRanges.Count)
             {
                 return new ParseResult<TSemanticActionResult>
                 {

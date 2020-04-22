@@ -30,14 +30,17 @@ namespace Trs.PegParser.Grammer.Operators
             else
             {
                 TActionResult actionResult = default;
+                var matchRange = new MatchRange(startPosition, 1);
+                var match = new TokensMatch<TTokenTypeName>(inputTokens, matchRange);
                 if (_matchAction != null)
                 {
-                    actionResult = _matchAction(new MatchRange(startPosition, 1), inputTokens, null);
+                    actionResult = _matchAction(match, null);
                 }
                 return new ParseResult<TActionResult> { 
-                    Succeed = true, 
+                    Succeed = true,
                     NextParsePosition = startPosition + 1,
-                    SemanticActionResult = actionResult
+                    SemanticActionResult = actionResult,
+                    MatchedRange = matchRange
                 };
             }
         }

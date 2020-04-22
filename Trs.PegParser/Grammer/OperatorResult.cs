@@ -11,7 +11,12 @@
         /// Where to parse from next.
         /// </summary>
         public int? NextParsePosition;
-        
+
+        /// <summary>
+        /// Range of tokens matched.
+        /// </summary>
+        public MatchRange MatchedRange;
+
         /// <summary>
         /// The result of the semantic actions carried out when this match took place.
         /// </summary>

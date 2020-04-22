@@ -2,6 +2,7 @@
 {
     public enum ParsingRuleNames
     {
-        MatchA
+        TerminalTest,
+        ConcatenationTest
     }
 }
