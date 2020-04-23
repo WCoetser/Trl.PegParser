@@ -45,6 +45,8 @@ namespace Trs.PegParser
             SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
         => new Sequence<TTokenTypeName, TNonTerminalName, TActionResult>(sequenceDefinitions, matchAction ?? _defaultSequenceAction);
 
+        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> NonTerminal(TNonTerminalName head)
+        => new NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>(head);
 
         /// <summary>
         /// This method exists to avoid re-typing all the generic constraints in relation to the 

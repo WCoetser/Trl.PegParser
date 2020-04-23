@@ -3,6 +3,8 @@
     public enum ParsingRuleNames
     {
         TerminalTest,
-        ConcatenationTest
+        ConcatenationTest,
+        Head,
+        Tail
     }
 }
