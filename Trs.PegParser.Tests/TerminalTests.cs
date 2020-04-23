@@ -42,9 +42,17 @@ namespace Trs.PegParser.Tests
         }
 
         [Fact]
-        public void ShouldReturnNonTerminalNamesForValidationChecks()
+        public void ShouldNotReturnNonTerminalNamesForValidationChecks()
         {
-            throw new NotImplementedException();
+            // Arrange
+            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
+            var terminal = peg.Terminal(TokenNames.A);
+
+            // Act
+            var nonTerminalNames = terminal.GetNonTerminalNames();
+
+            // Assert
+            Assert.Empty(nonTerminalNames);
         }
     }
 }
