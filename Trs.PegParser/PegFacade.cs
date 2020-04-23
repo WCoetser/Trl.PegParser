@@ -19,17 +19,15 @@ namespace Trs.PegParser
         where TTokenTypeName : Enum
         where TNonTerminalName : Enum
     {
-        // TODO: 
-        public void SetTerminalDefaultAction()
-        {
-            throw new NotImplementedException();
-        }
+        private Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>> _actionByTerminalToken
+            = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
 
-        // TODO:
-        public void SetSequenceDefaultAction()
-        {
-            throw new NotImplementedException();
-        }
+        public void SetTerminalDefaultAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+            => _actionByTerminalToken[tokenType] = semanticAction;
+
+        public void SetDefaultSequenceAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+            => _defaultSequenceAction = semanticAction;
 
         public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
         => new Tokenizer<TTokenTypeName>(prioritizedTokenDefinitions);
@@ -39,9 +37,13 @@ namespace Trs.PegParser
         => new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(startSymbol, grammerRules);
 
         public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
+            params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] sequenceDefinitions)
+        => Sequence(sequenceDefinitions, null);
+
+        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> sequenceDefinitions,
             SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
-        => new Sequence<TTokenTypeName, TNonTerminalName, TActionResult>(sequenceDefinitions, matchAction);
+        => new Sequence<TTokenTypeName, TNonTerminalName, TActionResult>(sequenceDefinitions, matchAction ?? _defaultSequenceAction);
 
 
         /// <summary>
@@ -57,6 +59,14 @@ namespace Trs.PegParser
 
         public Terminal<TTokenTypeName, TNonTerminalName, TActionResult> Terminal(
             TTokenTypeName expectedToken, SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
-        => new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken, matchAction);
+        {
+            var semanticAction = matchAction;
+            if (semanticAction == null && _actionByTerminalToken.TryGetValue(expectedToken, 
+                out SemanticAction<TActionResult, TTokenTypeName> action))
+            {
+                semanticAction = action;
+            }
+            return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken,  semanticAction);
+        }
     }
 }

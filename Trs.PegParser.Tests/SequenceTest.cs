@@ -7,38 +7,45 @@ using Xunit;
 
 namespace Trs.PegParser.Tests
 {
-    public class ConcatenationTest
+    public class SequenceTest
     {
         [Fact]
         public void ShouldParse()
         {
-            var inputString = "aaabbb";
+            // Arrange
 
-            // Arrange ... Store values for assert
+            var inputString = "aaabbb";
             TokensMatch<TokenNames> matchedTokenRangeAssert = null;
             List<string> subActionResults = null;
-
-            // Arrange ... Set up parser
+            
             var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
+            
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+
             var extractValueSequence = peg.SemanticAction((matchedTokenRange, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
                 matchedTokenRangeAssert = matchedTokenRange;
                 subActionResults = subResults.ToList();
                 return matchedTokenRange.GetMatchedString();
-            });
+            });            
             var extractValueTerminal = peg.SemanticAction((matchedTokenRange, _) => matchedTokenRange.GetMatchedString());
+            peg.SetTerminalDefaultAction(TokenNames.A, extractValueTerminal);
+            peg.SetTerminalDefaultAction(TokenNames.B, extractValueTerminal);
+            peg.SetDefaultSequenceAction(extractValueSequence);
+
             var parser = peg.Parser(ParsingRuleNames.ConcatenationTest, new[] {
-                peg.Rule(ParsingRuleNames.ConcatenationTest, peg.Sequence(new [] { peg.Terminal(TokenNames.A, extractValueTerminal), peg.Terminal(TokenNames.B, extractValueTerminal) }, extractValueSequence))
+                peg.Rule(ParsingRuleNames.ConcatenationTest, peg.Sequence(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B)))
             });
 
             // Act
+
             var tokens = tokenizer.Tokenize(inputString);
             if (!tokens.Succeed) throw new Exception();
             var parseResult = parser.Parse(tokens);
 
             // Assert
+
             Assert.Equal(new MatchRange(0, 2), matchedTokenRangeAssert.MatchedTokenIndices);
             Assert.Equal(2, subActionResults.Count);
             Assert.Equal("aaa", subActionResults[0]);
