@@ -11,7 +11,14 @@ namespace Trs.PegParser.Grammer.Operators
         where TTokenTypeName : Enum
         where TNoneTerminalName : Enum
     {
-        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> _sequenceDefinitions;
+        /// <summary>
+        /// Elements making up the sequence.
+        /// </summary>
+        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> _sequenceDefinition;
+
+        /// <summary>
+        /// Action to take when sequence is matched.
+        /// </summary>
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
 
         public Sequence(IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> sequenceDefinitions,
@@ -20,14 +27,14 @@ namespace Trs.PegParser.Grammer.Operators
             {
                 throw new ArgumentException("Sequence (concatenation) must contain at least 2 elements.", nameof(sequenceDefinitions));
             }
-            _sequenceDefinitions = sequenceDefinitions;
+            _sequenceDefinition = sequenceDefinitions;
             _matchAction = matchAction;
         }
 
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         {
             var noneTerminalNames = new HashSet<TNoneTerminalName>();
-            foreach (var seqElement in _sequenceDefinitions)
+            foreach (var seqElement in _sequenceDefinition)
             {
                 noneTerminalNames.UnionWith(seqElement.GetNonTerminalNames());
             }
@@ -39,7 +46,7 @@ namespace Trs.PegParser.Grammer.Operators
             int nextParsePosition = startPosition;
             int totalMatchLength = 0;
             var subActionResults = new List<TActionResult>();
-            foreach (var sequenceElement in _sequenceDefinitions)
+            foreach (var sequenceElement in _sequenceDefinition)
             {
                 var currentResult = sequenceElement.Parse(inputTokens, nextParsePosition);
                 // TODO: Adaptive parsing - skip failed sub results
@@ -65,5 +72,17 @@ namespace Trs.PegParser.Grammer.Operators
                 SemanticActionResult = actionResult
             };
         }
+
+        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>
+            .SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        {
+            foreach (var sequenceElement in _sequenceDefinition)
+            {
+                sequenceElement.SetNonTerminalParsingRuleBody(ruleBodies);
+            }
+        }
+
+        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
+            => _sequenceDefinition.Any(seqElement => seqElement.HasNonTerminalParsingRuleBodies);
     }
 }

@@ -10,15 +10,26 @@ namespace Trs.PegParser.Grammer
         where TNonTerminalName: Enum
     {
         private readonly TNonTerminalName _startSymbol;
-        private readonly Dictionary<TNonTerminalName, IParsingOperatorExecution<TTokenTypeName, TSemanticActionResult>> _grammerRules;
+        private readonly Dictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> _grammerRules;
 
         public Parser(TNonTerminalName startSymbol, 
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules) {
 
             ValidateGrammer(startSymbol, grammerRules);
+
             _startSymbol = startSymbol;
             _grammerRules = grammerRules.ToDictionary(rule => rule.RuleIdentifier, 
-                rule => (IParsingOperatorExecution<TTokenTypeName, TSemanticActionResult>)rule.ParsingExpression);
+                rule => rule.ParsingExpression);
+
+            AttachRuleBodiesToNonTerminals();
+        }
+
+        private void AttachRuleBodiesToNonTerminals()
+        {
+            foreach (var rule in _grammerRules)
+            {
+                rule.Value.SetNonTerminalParsingRuleBody(_grammerRules);
+            }
         }
 
         private void ValidateGrammer(TNonTerminalName startSymbol, IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules)
@@ -33,6 +44,14 @@ namespace Trs.PegParser.Grammer
             if (!grammerRules.Any(r => r.RuleIdentifier.Equals(startSymbol)))
             {
                 throw new ArgumentException("Start symbol not found in grammer rule definitions.");
+            }
+
+            foreach (var rule in grammerRules)
+            {
+                if (rule.ParsingExpression.HasNonTerminalParsingRuleBodies)
+                {
+                    throw new ArgumentException($"Parsing rule for {rule.RuleIdentifier} already used in different parser.");
+                }
             }
 
             // All non-terminals must refer to a known rule

@@ -19,5 +19,23 @@ namespace Trs.PegParser.Grammer.Operators
         {
             throw new NotImplementedException();
         }
+
+        IEnumerable<TNoneTerminalName> IParsingOperatorValidation<TNoneTerminalName>.GetNonTerminalNames()
+        {
+            throw new NotImplementedException();
+        }
+
+        ParseResult<TActionResult> IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        {
+            throw new NotImplementedException();
+        }
+
+        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies 
+            => throw new NotImplementedException();
     }
 }
