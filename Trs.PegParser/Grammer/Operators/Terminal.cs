@@ -19,28 +19,28 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
             => Enumerable.Empty<TNoneTerminalName>();
         
-        public ParseResult<TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
+        public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
             int startPosition)
         {
             if (startPosition >= inputTokens.Count 
                 || !(inputTokens[startPosition].TokenName.Equals(_expectedToken)))
             {
-                return new ParseResult<TActionResult> { Succeed = false };
+                return new ParseResult<TTokenTypeName, TActionResult> { Succeed = false };
             }
             else
             {
                 TActionResult actionResult = default;
-                var matchRange = new MatchRange(startPosition, 1);
-                var match = new TokensMatch<TTokenTypeName>(inputTokens, matchRange);
+                var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 1));
                 if (_matchAction != null)
                 {
+                    // Terminals cannot have sub-results, therefore pass null
                     actionResult = _matchAction(match, null);
                 }
-                return new ParseResult<TActionResult> { 
+                return new ParseResult<TTokenTypeName, TActionResult> { 
                     Succeed = true,
                     NextParsePosition = startPosition + 1,
                     SemanticActionResult = actionResult,
-                    MatchedRange = matchRange
+                    MatchedTokens = match
                 };
             }
         }

@@ -2,9 +2,11 @@
 {
     public enum ParsingRuleNames
     {
+        Start,
         TerminalTest,
         ConcatenationTest,
         Head,
-        Tail
+        Tail,
+        NonTerminalA
     }
 }

@@ -13,16 +13,16 @@ namespace Trs.PegParser.Grammer
     {
         private readonly IReadOnlyList<TokenMatch<TTokenTypeName>> _inputTokens;
 
-        public TokensMatch(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, MatchRange matchedTokenIndices)
-            => (_inputTokens, MatchedTokenIndices) = (inputTokens, matchedTokenIndices);
+        public TokensMatch(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, MatchRange matchedIndices)
+            => (_inputTokens, MatchedIndices) = (inputTokens, matchedIndices);
 
         public IEnumerable<TokenMatch<TTokenTypeName>> GetMatchedTokens()
-            => Enumerable.Range(MatchedTokenIndices.StartIndex, MatchedTokenIndices.Length)
+            => Enumerable.Range(MatchedIndices.StartIndex, MatchedIndices.Length)
                     .Select(i => _inputTokens[i]);
 
         public string GetMatchedString() 
             => string.Concat(GetMatchedTokens().Select(t => t.GetMatchedString()));
 
-        public MatchRange MatchedTokenIndices { get; }
+        public MatchRange MatchedIndices { get; }
     }
 }

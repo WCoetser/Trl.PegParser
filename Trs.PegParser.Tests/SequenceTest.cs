@@ -30,8 +30,8 @@ namespace Trs.PegParser.Tests
                 return matchedTokenRange.GetMatchedString();
             });            
             var extractValueTerminal = peg.SemanticAction((matchedTokenRange, _) => matchedTokenRange.GetMatchedString());
-            peg.SetTerminalDefaultAction(TokenNames.A, extractValueTerminal);
-            peg.SetTerminalDefaultAction(TokenNames.B, extractValueTerminal);
+            peg.SetDefaultTerminalAction(TokenNames.A, extractValueTerminal);
+            peg.SetDefaultTerminalAction(TokenNames.B, extractValueTerminal);
             peg.SetDefaultSequenceAction(extractValueSequence);
 
             var parser = peg.Parser(ParsingRuleNames.ConcatenationTest, new[] {
@@ -41,12 +41,11 @@ namespace Trs.PegParser.Tests
             // Act
 
             var tokens = tokenizer.Tokenize(inputString);
-            if (!tokens.Succeed) throw new Exception();
             var parseResult = parser.Parse(tokens);
 
             // Assert
 
-            Assert.Equal(new MatchRange(0, 2), matchedTokenRangeAssert.MatchedTokenIndices);
+            Assert.Equal(new MatchRange(0, 2), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(2, subActionResults.Count);
             Assert.Equal("aaa", subActionResults[0]);
             Assert.Equal("bbb", subActionResults[1]);

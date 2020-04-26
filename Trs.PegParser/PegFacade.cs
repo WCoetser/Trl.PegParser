@@ -22,12 +22,25 @@ namespace Trs.PegParser
         private Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>> _actionByTerminalToken
             = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
         private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
+        private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
+            = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
-        public void SetTerminalDefaultAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        // ====================
+
+        public void SetDefaultTerminalAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => _actionByTerminalToken[tokenType] = semanticAction;
+
+        public void SetDefaultNonTerminalAction(TNonTerminalName nonTerminalA, SemanticAction<TActionResult, TTokenTypeName> matchAction)
+        => _actionByNonTerminal[nonTerminalA] = matchAction;
 
         public void SetDefaultSequenceAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => _defaultSequenceAction = semanticAction;
+
+        public ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult> Rule(TNonTerminalName ruleHead,
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> ruleBody)
+        => new ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>(ruleHead, ruleBody);
+
+        // ====================
 
         public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
         => new Tokenizer<TTokenTypeName>(prioritizedTokenDefinitions);
@@ -35,6 +48,8 @@ namespace Trs.PegParser
         public Parser<TTokenTypeName, TNonTerminalName, TActionResult> Parser(TNonTerminalName startSymbol,
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>> grammerRules)
         => new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(startSymbol, grammerRules);
+
+        // ====================
 
         public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] sequenceDefinitions)
@@ -45,8 +60,13 @@ namespace Trs.PegParser
             SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
         => new Sequence<TTokenTypeName, TNonTerminalName, TActionResult>(sequenceDefinitions, matchAction ?? _defaultSequenceAction);
 
-        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> NonTerminal(TNonTerminalName head)
-        => new NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>(head);
+        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> NonTerminal(TNonTerminalName head, 
+            SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var action = semanticAction;
+            _ = action == null && _actionByNonTerminal.TryGetValue(head, out action);
+            return new NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>(head, action);
+        }
 
         /// <summary>
         /// This method exists to avoid re-typing all the generic constraints in relation to the 
@@ -55,20 +75,12 @@ namespace Trs.PegParser
         public SemanticAction<TActionResult, TTokenTypeName> SemanticAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => semanticAction;
 
-        public ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult> Rule(TNonTerminalName ruleHead,
-            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> ruleBody)
-        => new ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>(ruleHead, ruleBody);
-
         public Terminal<TTokenTypeName, TNonTerminalName, TActionResult> Terminal(
-            TTokenTypeName expectedToken, SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
+            TTokenTypeName expectedToken, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
         {
-            var semanticAction = matchAction;
-            if (semanticAction == null && _actionByTerminalToken.TryGetValue(expectedToken, 
-                out SemanticAction<TActionResult, TTokenTypeName> action))
-            {
-                semanticAction = action;
-            }
-            return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken,  semanticAction);
+            var matchAction = semanticAction;
+            _ = matchAction == null && _actionByTerminalToken.TryGetValue(expectedToken, out matchAction);
+            return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken, matchAction);
         }
     }
 }

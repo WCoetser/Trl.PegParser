@@ -41,7 +41,7 @@ namespace Trs.PegParser.Grammer.Operators
             return noneTerminalNames;
         }        
 
-        public ParseResult<TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
         {
             int nextParsePosition = startPosition;
             int totalMatchLength = 0;
@@ -56,20 +56,20 @@ namespace Trs.PegParser.Grammer.Operators
                 }
                 subActionResults.Add(currentResult.SemanticActionResult);
                 nextParsePosition = currentResult.NextParsePosition.Value;
-                totalMatchLength += currentResult.MatchedRange.Length;
+                totalMatchLength += currentResult.MatchedTokens.MatchedIndices.Length;
             }
             TActionResult actionResult = default;
-            var matchRange = new MatchRange(startPosition, totalMatchLength);
-            var match = new TokensMatch<TTokenTypeName>(inputTokens, matchRange);
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, totalMatchLength));
             if (_matchAction != null)
             {
                 actionResult = _matchAction(match, subActionResults);
             }
-            return new ParseResult<TActionResult>
+            return new ParseResult<TTokenTypeName, TActionResult>
             {
                 Succeed = true,
                 NextParsePosition = nextParsePosition,
-                SemanticActionResult = actionResult
+                SemanticActionResult = actionResult,
+                MatchedTokens = match
             };
         }
 

@@ -15,7 +15,7 @@ namespace Trs.PegParser.Grammer.Operators
             throw new NotImplementedException();
         }
 
-        public ParseResult<TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
         {
             throw new NotImplementedException();
         }
