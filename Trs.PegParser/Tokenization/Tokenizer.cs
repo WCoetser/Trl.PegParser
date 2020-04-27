@@ -38,6 +38,11 @@ namespace Trs.PegParser.Tokenization
 
         private static List<MatchRange> GetMismatches(SortedDictionary<int, TokenMatch<TTokenName>> matches, int inputStringLength)
         {
+            if (inputStringLength == 0)
+            {
+                return new List<MatchRange>();
+            }
+
             if (matches.Count == 0)
             {
                 return new List<MatchRange>

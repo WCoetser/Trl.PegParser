@@ -22,34 +22,29 @@ namespace Trs.PegParser
         private Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>> _actionByTerminalToken
             = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
         private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultEmptyStringAction;
         private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
             = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
-        // ====================
+        // ==================== Semantic actions
 
         public void SetDefaultTerminalAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => _actionByTerminalToken[tokenType] = semanticAction;
+
+        public void SetDefaultEmptyStringAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        => _defaultEmptyStringAction = semanticAction;
 
         public void SetDefaultNonTerminalAction(TNonTerminalName nonTerminalA, SemanticAction<TActionResult, TTokenTypeName> matchAction)
         => _actionByNonTerminal[nonTerminalA] = matchAction;
 
         public void SetDefaultSequenceAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
-            => _defaultSequenceAction = semanticAction;
+        => _defaultSequenceAction = semanticAction;
 
         public ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult> Rule(TNonTerminalName ruleHead,
             IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> ruleBody)
         => new ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>(ruleHead, ruleBody);
 
-        // ====================
-
-        public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
-        => new Tokenizer<TTokenTypeName>(prioritizedTokenDefinitions);
-
-        public Parser<TTokenTypeName, TNonTerminalName, TActionResult> Parser(TNonTerminalName startSymbol,
-            IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>> grammerRules)
-        => new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(startSymbol, grammerRules);
-
-        // ====================
+        // ==================== Parsing operators
 
         public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] sequenceDefinitions)
@@ -68,12 +63,12 @@ namespace Trs.PegParser
             return new NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>(head, action);
         }
 
-        /// <summary>
-        /// This method exists to avoid re-typing all the generic constraints in relation to the 
-        /// reset of the PEG parser in this facade. Therefore it just passes the input to the output.
-        /// </summary>
-        public SemanticAction<TActionResult, TTokenTypeName> SemanticAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
-            => semanticAction;
+        public EmptyString<TTokenTypeName, TNonTerminalName, TActionResult> EmptyString(
+            SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var matchAction = semanticAction ?? _defaultEmptyStringAction;
+            return new EmptyString<TTokenTypeName, TNonTerminalName, TActionResult>(matchAction);
+        }
 
         public Terminal<TTokenTypeName, TNonTerminalName, TActionResult> Terminal(
             TTokenTypeName expectedToken, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
@@ -82,5 +77,22 @@ namespace Trs.PegParser
             _ = matchAction == null && _actionByTerminalToken.TryGetValue(expectedToken, out matchAction);
             return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken, matchAction);
         }
+
+        // ==================== The rest
+
+        public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
+        => new Tokenizer<TTokenTypeName>(prioritizedTokenDefinitions);
+
+        public Parser<TTokenTypeName, TNonTerminalName, TActionResult> Parser(TNonTerminalName startSymbol,
+            IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>> grammerRules)
+        => new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(startSymbol, grammerRules);
+
+        /// <summary>
+        /// This method exists to avoid re-typing all the generic constraints in relation to the 
+        /// reset of the PEG parser in this facade. Therefore it just passes the input to the output.
+        /// </summary>
+        public SemanticAction<TActionResult, TTokenTypeName> SemanticAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+            => semanticAction;
+
     }
 }

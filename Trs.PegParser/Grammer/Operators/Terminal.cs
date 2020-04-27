@@ -27,22 +27,19 @@ namespace Trs.PegParser.Grammer.Operators
             {
                 return new ParseResult<TTokenTypeName, TActionResult> { Succeed = false };
             }
-            else
+            TActionResult actionResult = default;
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 1));
+            if (_matchAction != null)
             {
-                TActionResult actionResult = default;
-                var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 1));
-                if (_matchAction != null)
-                {
-                    // Terminals cannot have sub-results, therefore pass null
-                    actionResult = _matchAction(match, null);
-                }
-                return new ParseResult<TTokenTypeName, TActionResult> { 
-                    Succeed = true,
-                    NextParsePosition = startPosition + 1,
-                    SemanticActionResult = actionResult,
-                    MatchedTokens = match
-                };
+                // Terminals cannot have sub-results, therefore pass null
+                actionResult = _matchAction(match, null);
             }
+            return new ParseResult<TTokenTypeName, TActionResult> { 
+                Succeed = true,
+                NextParsePosition = startPosition + 1,
+                SemanticActionResult = actionResult,
+                MatchedTokens = match
+            };
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

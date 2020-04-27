@@ -1,31 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.Grammer.Operators
 {
-    class EmptyString<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class EmptyString<TTokenTypeName, TNoneTerminalName, TActionResult>
         : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
         where TTokenTypeName : Enum
         where TNoneTerminalName : Enum
     {
+        private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
+
+        public EmptyString(SemanticAction<TActionResult, TTokenTypeName> matchAction)
+            => _matchAction = matchAction;
+
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
-        {
-            throw new NotImplementedException();
-        }
+        => Enumerable.Empty<TNoneTerminalName>();
 
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
         {
-            throw new NotImplementedException();
+            // Note: It is possible to match the empty string at the end of the input tokens,
+            // therefore this is > instead of >=. An example of this happening is when the 
+            // input tokens length = 0.
+            if (startPosition > inputTokens.Count)
+            {
+                return new ParseResult<TTokenTypeName, TActionResult> { Succeed = false };
+            }
+
+            TActionResult actionResult = default;
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 0));
+            if (_matchAction != null)
+            {
+                // Terminals cannot have sub-results, therefore pass null
+                actionResult = _matchAction(match, null);
+            }
+            return new ParseResult<TTokenTypeName, TActionResult>
+            {
+                Succeed = true,
+                NextParsePosition = startPosition,
+                SemanticActionResult = actionResult,
+                MatchedTokens = match
+            };
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
-            throw new NotImplementedException();
+            // Nothing to do here - empty string has no non-terminals
         }
 
         bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
-            => throw new NotImplementedException();
+            => false;
     }
 }
