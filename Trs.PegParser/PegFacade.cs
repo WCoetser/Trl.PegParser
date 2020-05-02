@@ -23,10 +23,14 @@ namespace Trs.PegParser
             = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
         private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultEmptyStringAction;
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultOptionalAction;
         private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
             = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
         // ==================== Semantic actions
+
+        public void SetDefaultOptionalAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        => _defaultOptionalAction = semanticAction;
 
         public void SetDefaultTerminalAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => _actionByTerminalToken[tokenType] = semanticAction;
@@ -78,6 +82,14 @@ namespace Trs.PegParser
             return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken, matchAction);
         }
 
+        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Optional(
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression,
+            SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var matchAction = semanticAction ?? _defaultOptionalAction;
+            return new Optional<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression, matchAction);
+        }
+
         // ==================== The rest
 
         public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
@@ -92,7 +104,6 @@ namespace Trs.PegParser
         /// reset of the PEG parser in this facade. Therefore it just passes the input to the output.
         /// </summary>
         public SemanticAction<TActionResult, TTokenTypeName> SemanticAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
-            => semanticAction;
-
+            => semanticAction;        
     }
 }
