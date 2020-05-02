@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -7,25 +6,27 @@ namespace Trs.PegParser.Tests
 {
     public class EmptyStringTests
     {
-        [Fact]
-        public void ShouldParseEmptyInputTokens()
-        {
-            // Arrange ... Store values for assert
-            TokensMatch<TokenNames> matchedTokenRangeAssert = null;
-            IEnumerable<string> subActionResults = null;
-            string inputString = string.Empty;
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private IEnumerable<string> subActionResults = null;
 
-            // Arrange ... Set up parser
-            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+        public EmptyStringTests()
+        {
+            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var extractValue = peg.SemanticAction((tokensMatch, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
-                matchedTokenRangeAssert = tokensMatch;
                 subActionResults = subResults;
                 return tokensMatch.GetMatchedString();
             });
             peg.SetDefaultEmptyStringAction(extractValue);
+        }
+
+        [Fact]
+        public void ShouldParseEmptyInputTokens()
+        {
+            // Arrange
+            string inputString = string.Empty;
+            var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
                 peg.Rule(ParsingRuleNames.Start, peg.EmptyString()),
             });

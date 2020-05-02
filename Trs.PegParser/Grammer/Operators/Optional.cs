@@ -28,30 +28,16 @@ namespace Trs.PegParser.Grammer.Operators
             var result = _subExpression.Parse(inputTokens, startPosition);
             if (result.Succeed)
             {
-                return new ParseResult<TTokenTypeName, TActionResult>
-                {
-                    MatchedTokens = result.MatchedTokens,
-                    SemanticActionResult = _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult }),
-                    NextParsePosition = result.NextParsePosition,
-                    Succeed = true
-                };
+                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParsePosition, result.MatchedTokens, 
+                    _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult }));
             };
             // Optional: empty match
             if (startPosition > inputTokens.Count)
             {
-                return new ParseResult<TTokenTypeName, TActionResult>
-                {
-                    Succeed = false
-                };
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
             }
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 0));
-            return new ParseResult<TTokenTypeName, TActionResult>
-            {
-                MatchedTokens = matchedTokens,
-                NextParsePosition = startPosition,
-                SemanticActionResult = _matchAction(matchedTokens, null),
-                Succeed = true
-            };
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startPosition, matchedTokens, _matchAction(matchedTokens, null));
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

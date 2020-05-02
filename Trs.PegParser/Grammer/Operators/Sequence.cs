@@ -55,7 +55,7 @@ namespace Trs.PegParser.Grammer.Operators
                     return currentResult;
                 }
                 subActionResults.Add(currentResult.SemanticActionResult);
-                nextParsePosition = currentResult.NextParsePosition.Value;
+                nextParsePosition = currentResult.NextParsePosition;
                 totalMatchLength += currentResult.MatchedTokens.MatchedIndices.Length;
             }
             TActionResult actionResult = default;
@@ -64,13 +64,7 @@ namespace Trs.PegParser.Grammer.Operators
             {
                 actionResult = _matchAction(match, subActionResults);
             }
-            return new ParseResult<TTokenTypeName, TActionResult>
-            {
-                Succeed = true,
-                NextParsePosition = nextParsePosition,
-                SemanticActionResult = actionResult,
-                MatchedTokens = match
-            };
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(nextParsePosition, match, actionResult);            
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

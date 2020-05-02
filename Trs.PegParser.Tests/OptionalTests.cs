@@ -8,16 +8,13 @@ namespace Trs.PegParser.Tests
 {
     public class OptionalTests
     {
-        [Fact]
-        public void ShouldParseEmptyCase()
+        PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private TokensMatch<TokenNames> matchedTokenRangeAssert = null;
+        private IEnumerable<string> subActionResults = null;
+
+        public OptionalTests()
         {
-            string testInput = string.Empty;
-
-            TokensMatch<TokenNames> matchedTokenRangeAssert = null;
-            IEnumerable<string> subActionResults = null;
-
-            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
+            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             peg.SetDefaultTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
             peg.SetDefaultOptionalAction((matchedTokenRange, subResults) =>
             {
@@ -25,6 +22,14 @@ namespace Trs.PegParser.Tests
                 subActionResults = subResults;
                 return matchedTokenRange.GetMatchedString();
             });
+        }
+
+        [Fact]
+        public void ShouldParseEmptyCase()
+        {
+            // Arrange
+            string testInput = string.Empty;
+            var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
             var parser = peg.Parser(ParsingRuleNames.Start, new[]
             {
                 peg.Rule(ParsingRuleNames.Start, peg.Optional(peg.Terminal(TokenNames.A)))
@@ -46,18 +51,7 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string testInput = "aaaa";
-            TokensMatch<TokenNames> matchedTokenRangeAssert = null;
-            List<string> subActionResults = null;
-
-            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            peg.SetDefaultTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
-            peg.SetDefaultOptionalAction((matchedTokenRange, subResults) =>
-            {
-                matchedTokenRangeAssert = matchedTokenRange;
-                subActionResults = subResults.ToList();
-                return matchedTokenRange.GetMatchedString();
-            });
             var parser = peg.Parser(ParsingRuleNames.Start, new []
             {
                 peg.Rule(ParsingRuleNames.Start, peg.Optional(peg.Terminal(TokenNames.A)))

@@ -9,42 +9,41 @@ namespace Trs.PegParser.Tests
 {
     public class SequenceTest
     {
-        [Fact]
-        public void ShouldParse()
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private TokensMatch<TokenNames> matchedTokenRangeAssert = null;
+        private List<string> subActionResults = null;
+
+        public SequenceTest()
         {
-            // Arrange
-
-            var inputString = "aaabbb";
-            TokensMatch<TokenNames> matchedTokenRangeAssert = null;
-            List<string> subActionResults = null;
-            
-            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            
-            var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-
+            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var extractValueSequence = peg.SemanticAction((matchedTokenRange, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
                 matchedTokenRangeAssert = matchedTokenRange;
                 subActionResults = subResults.ToList();
                 return matchedTokenRange.GetMatchedString();
-            });            
+            });
             var extractValueTerminal = peg.SemanticAction((matchedTokenRange, _) => matchedTokenRange.GetMatchedString());
             peg.SetDefaultTerminalAction(TokenNames.A, extractValueTerminal);
             peg.SetDefaultTerminalAction(TokenNames.B, extractValueTerminal);
             peg.SetDefaultSequenceAction(extractValueSequence);
+        }
 
+        [Fact]
+        public void ShouldParse()
+        {
+            // Arrange
+            var inputString = "aaabbb";
+            var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.ConcatenationTest, new[] {
                 peg.Rule(ParsingRuleNames.ConcatenationTest, peg.Sequence(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B)))
             });
 
             // Act
-
             var tokens = tokenizer.Tokenize(inputString);
             var parseResult = parser.Parse(tokens);
 
             // Assert
-
             Assert.Equal(new MatchRange(0, 2), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(2, subActionResults.Count);
             Assert.Equal("aaa", subActionResults[0]);
@@ -58,7 +57,6 @@ namespace Trs.PegParser.Tests
         public void ShouldReturnNonTerminalNamesForValidationChecks()
         {
             // Arrange
-            var peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var seq = peg.Sequence(peg.NonTerminal(ParsingRuleNames.Head), peg.NonTerminal(ParsingRuleNames.Tail));
 
             // Act

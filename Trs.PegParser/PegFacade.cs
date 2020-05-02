@@ -24,6 +24,7 @@ namespace Trs.PegParser
         private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultEmptyStringAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultOptionalAction;
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultOrderedChoiceAction;
         private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
             = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
@@ -31,6 +32,9 @@ namespace Trs.PegParser
 
         public void SetDefaultOptionalAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
         => _defaultOptionalAction = semanticAction;
+
+        public void SetDefaultOrderedChoiceAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        => _defaultOrderedChoiceAction = semanticAction;
 
         public void SetDefaultTerminalAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
             => _actionByTerminalToken[tokenType] = semanticAction;
@@ -50,16 +54,16 @@ namespace Trs.PegParser
 
         // ==================== Parsing operators
 
-        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
+        public Sequence<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] sequenceDefinitions)
         => Sequence(sequenceDefinitions, null);
 
-        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
+        public Sequence<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> sequenceDefinitions,
             SemanticAction<TActionResult, TTokenTypeName> matchAction = null)
         => new Sequence<TTokenTypeName, TNonTerminalName, TActionResult>(sequenceDefinitions, matchAction ?? _defaultSequenceAction);
 
-        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> NonTerminal(TNonTerminalName head, 
+        public NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult> NonTerminal(TNonTerminalName head, 
             SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
         {
             var action = semanticAction;
@@ -82,13 +86,25 @@ namespace Trs.PegParser
             return new Terminal<TTokenTypeName, TNonTerminalName, TActionResult>(expectedToken, matchAction);
         }
 
-        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Optional(
+        public Optional<TTokenTypeName, TNonTerminalName, TActionResult> Optional(
             IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression,
             SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
         {
             var matchAction = semanticAction ?? _defaultOptionalAction;
             return new Optional<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression, matchAction);
         }
+
+        public OrderedChoice<TTokenTypeName, TNonTerminalName, TActionResult> OrderedChoice(
+            IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> orderedChoices,
+            SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var matchAction = semanticAction ?? _defaultOrderedChoiceAction;
+            return new OrderedChoice<TTokenTypeName, TNonTerminalName, TActionResult>(orderedChoices, matchAction);
+        }
+
+        public OrderedChoice<TTokenTypeName, TNonTerminalName, TActionResult> OrderedChoice(
+            params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] orderedChoices)
+        => OrderedChoice(orderedChoices, null);
 
         // ==================== The rest
 

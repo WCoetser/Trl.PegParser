@@ -26,7 +26,7 @@ namespace Trs.PegParser.Grammer.Operators
             // input tokens length = 0.
             if (startPosition > inputTokens.Count)
             {
-                return new ParseResult<TTokenTypeName, TActionResult> { Succeed = false };
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
             }
 
             TActionResult actionResult = default;
@@ -36,13 +36,7 @@ namespace Trs.PegParser.Grammer.Operators
                 // Terminals cannot have sub-results, therefore pass null
                 actionResult = _matchAction(match, null);
             }
-            return new ParseResult<TTokenTypeName, TActionResult>
-            {
-                Succeed = true,
-                NextParsePosition = startPosition,
-                SemanticActionResult = actionResult,
-                MatchedTokens = match
-            };
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startPosition, match, actionResult);
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
