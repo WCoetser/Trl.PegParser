@@ -38,11 +38,16 @@ namespace Trs.PegParser.Grammer.Operators
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
             var parseResult = _ruleBody.Parse(inputTokens, startIndex);
+            TActionResult semanticActionResult = default;
             if (parseResult.Succeed)
             {
-                _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });
-            }            
-            return parseResult; // this could be succeed or fail
+                if (_matchAction != null)
+                {
+                    semanticActionResult = _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });
+                }
+                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(parseResult.NextParseStartIndex, parseResult.MatchedTokens, semanticActionResult);
+            }
+            return ParseResult<TTokenTypeName, TActionResult>.Failed(parseResult.NextParseStartIndex);
         }
     }
 }

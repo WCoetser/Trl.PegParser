@@ -5,27 +5,61 @@ using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.Grammer.Operators
 {
-    class ZeroOrMore<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class ZeroOrMore<TTokenTypeName, TNoneTerminalName, TActionResult>
         : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
         where TTokenTypeName : Enum
         where TNoneTerminalName : Enum
     {
+        private readonly IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _subExpression;
+        private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
+
+        public ZeroOrMore(IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> subExpression,
+            SemanticAction<TActionResult, TTokenTypeName> matchAction)
+        => (_subExpression, _matchAction) = (subExpression, matchAction);
+
+
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
-        {
-            throw new NotImplementedException();
-        }
+        => _subExpression.GetNonTerminalNames();
 
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
-            throw new NotImplementedException();
+            ParseResult<TTokenTypeName, TActionResult> lastResult;
+            int nextParseIndex = startIndex;
+            int previousNextParseIndex = -1;
+            int totalMatchLength = 0;
+            // TODO: Move this to a "yield return" method to stream parse results instead of storing them in memory
+            List<TActionResult> subResults = new List<TActionResult>();
+            do
+            {
+                lastResult = _subExpression.Parse(inputTokens, nextParseIndex);
+                if (lastResult.Succeed)
+                {
+                    totalMatchLength += lastResult.MatchedTokens.MatchedIndices.Length;
+                    previousNextParseIndex = nextParseIndex;
+                    nextParseIndex = lastResult.NextParseStartIndex;
+                    subResults.Add(lastResult.SemanticActionResult);
+                }
+                if (previousNextParseIndex == nextParseIndex)
+                {
+                    break;
+                }
+            }
+            while (lastResult.Succeed);
+            // This will always succeed, because it also accepts the empty case
+            var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, totalMatchLength));
+            TActionResult semanticResult = default;
+            if (_matchAction != null)
+            {
+                semanticResult = _matchAction(matchedTokens, subResults.AsReadOnly());
+            }
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(nextParseIndex, matchedTokens, semanticResult);
         }
 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
-        {
-            throw new NotImplementedException();
-        }
+        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>
+            .SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        => _subExpression.SetNonTerminalParsingRuleBody(ruleBodies);
 
         bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
-            => throw new NotImplementedException();
+            => _subExpression.HasNonTerminalParsingRuleBodies;
     }
 }

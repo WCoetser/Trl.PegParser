@@ -21,14 +21,20 @@ namespace Trs.PegParser
     {
         private Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>> _actionByTerminalToken
             = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
+        
         private SemanticAction<TActionResult, TTokenTypeName> _defaultSequenceAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultEmptyStringAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultOptionalAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultOrderedChoiceAction;
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultZeroOrMoreAction;
+
         private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
             = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
         // ==================== Semantic actions
+
+        public void SetDefaultZeroOrMoreAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        => _defaultZeroOrMoreAction = semanticAction;
 
         public void SetDefaultOptionalAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
         => _defaultOptionalAction = semanticAction;
@@ -53,6 +59,13 @@ namespace Trs.PegParser
         => new ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>(ruleHead, ruleBody);
 
         // ==================== Parsing operators
+
+        public ZeroOrMore<TTokenTypeName, TNonTerminalName, TActionResult> ZeroOrMore(
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var matchAction = semanticAction ?? _defaultZeroOrMoreAction;
+            return new ZeroOrMore<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression, matchAction);
+        }
 
         public Sequence<TTokenTypeName, TNonTerminalName, TActionResult> Sequence(
             params IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>[] sequenceDefinitions)
@@ -120,6 +133,6 @@ namespace Trs.PegParser
         /// reset of the PEG parser in this facade. Therefore it just passes the input to the output.
         /// </summary>
         public SemanticAction<TActionResult, TTokenTypeName> SemanticAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
-            => semanticAction;        
+            => semanticAction;
     }
 }

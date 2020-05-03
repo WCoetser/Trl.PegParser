@@ -40,12 +40,17 @@ namespace Trs.PegParser.Grammer.Operators
                     break;
                 }
             }
-            if (lastResult == null)
+            // lastResult cannot be null at this point - there will always be at least 2 choices to try
+            if (!lastResult.Succeed)
             {
                 return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, 
-                _matchAction(lastResult.MatchedTokens, new[] { lastResult.SemanticActionResult }));
+            TActionResult actionResult = default;
+            if (_matchAction != null)
+            {
+                actionResult = _matchAction(lastResult.MatchedTokens, new[] { lastResult.SemanticActionResult });
+            }
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, actionResult);
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

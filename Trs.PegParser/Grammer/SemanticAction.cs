@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Trs.PegParser.Tokenization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Trs.PegParser.Grammer
 {
@@ -15,6 +15,6 @@ namespace Trs.PegParser.Grammer
     /// <param name="matchedTokens">Represents the tokens that were matched</param>
     /// <returns>Results that can be used in parent semantic actions.</returns>
     public delegate TActionResult SemanticAction<TActionResult, TTokenTypeName>(TokensMatch<TTokenTypeName> matchedTokens, 
-        IEnumerable<TActionResult> subActionResults)
+        [NotNull] IEnumerable<TActionResult> subActionResults)
         where TTokenTypeName: Enum;
 }

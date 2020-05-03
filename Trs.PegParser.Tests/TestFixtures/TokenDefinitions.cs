@@ -7,7 +7,8 @@ namespace Trs.PegParser.Tests.TestFixtures
 {
     public static class TokenDefinitions
     {
-
+        // TODO: Create facade method for token definitions
+        
         public static IEnumerable<TokenDefinition<TokenNames>> Empty => Enumerable.Empty<TokenDefinition<TokenNames>>();
 
         public static IEnumerable<TokenDefinition<TokenNames>> MatchEmptyString => new[] {

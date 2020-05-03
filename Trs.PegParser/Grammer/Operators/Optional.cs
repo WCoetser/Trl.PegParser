@@ -24,20 +24,30 @@ namespace Trs.PegParser.Grammer.Operators
         
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
+            TActionResult semanticResult = default;
+
             // Optional: sub expression matches
             var result = _subExpression.Parse(inputTokens, startIndex);
             if (result.Succeed)
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParseStartIndex, result.MatchedTokens, 
-                    _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult }));
+                if (_matchAction != null)
+                {
+                    semanticResult = _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult });
+                }
+                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParseStartIndex, result.MatchedTokens, semanticResult);
             };
+
             // Optional: empty match
             if (startIndex > inputTokens.Count)
             {
                 return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, matchedTokens, _matchAction(matchedTokens, null));
+            if (_matchAction != null)
+            {
+                semanticResult = _matchAction(matchedTokens, Enumerable.Empty<TActionResult>());
+            }
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, matchedTokens, semanticResult);
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

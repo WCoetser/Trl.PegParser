@@ -34,7 +34,7 @@ namespace Trs.PegParser.Grammer.Operators
             if (_matchAction != null)
             {
                 // Terminals cannot have sub-results, therefore pass null
-                actionResult = _matchAction(match, null);
+                actionResult = _matchAction(match, Enumerable.Empty<TActionResult>());
             }
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, match, actionResult);
         }
