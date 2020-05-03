@@ -22,22 +22,22 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
         
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
             // Optional: sub expression matches
-            var result = _subExpression.Parse(inputTokens, startPosition);
+            var result = _subExpression.Parse(inputTokens, startIndex);
             if (result.Succeed)
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParsePosition, result.MatchedTokens, 
+                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParseStartIndex, result.MatchedTokens, 
                     _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult }));
             };
             // Optional: empty match
-            if (startPosition > inputTokens.Count)
+            if (startIndex > inputTokens.Count)
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
-            var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 0));
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startPosition, matchedTokens, _matchAction(matchedTokens, null));
+            var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, matchedTokens, _matchAction(matchedTokens, null));
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

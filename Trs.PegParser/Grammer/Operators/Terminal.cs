@@ -20,21 +20,21 @@ namespace Trs.PegParser.Grammer.Operators
             => Enumerable.Empty<TNoneTerminalName>();
         
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
-            int startPosition)
+            int startIndex)
         {
-            if (startPosition >= inputTokens.Count 
-                || !(inputTokens[startPosition].TokenName.Equals(_expectedToken)))
+            if (startIndex >= inputTokens.Count 
+                || !(inputTokens[startIndex].TokenName.Equals(_expectedToken)))
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
             TActionResult actionResult = default;
-            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 1));
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 1));
             if (_matchAction != null)
             {
                 // Terminals cannot have sub-results, therefore pass null
                 actionResult = _matchAction(match, null);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startPosition + 1, match, actionResult);
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex + 1, match, actionResult);
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>

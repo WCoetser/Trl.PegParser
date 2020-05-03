@@ -35,9 +35,9 @@ namespace Trs.PegParser.Grammer.Operators
         bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
             => _ruleBody != null;
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
-            var parseResult = _ruleBody.Parse(inputTokens, startPosition);
+            var parseResult = _ruleBody.Parse(inputTokens, startIndex);
             if (parseResult.Succeed)
             {
                 _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });

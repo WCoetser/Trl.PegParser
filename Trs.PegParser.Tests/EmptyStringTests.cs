@@ -40,7 +40,7 @@ namespace Trs.PegParser.Tests
             Assert.Null(subActionResults);
             Assert.True(parseResult.Succeed);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
-            Assert.Equal(0, parseResult.NextParsePosition);
+            Assert.Equal(0, parseResult.NextParseStartIndex);
         }
     }
 }

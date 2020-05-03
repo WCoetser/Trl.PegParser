@@ -29,12 +29,12 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _choiceSubExpressions.SelectMany(cse => cse.GetNonTerminalNames());
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
             ParseResult<TTokenTypeName, TActionResult> lastResult = null;
             foreach (var subExpression in _choiceSubExpressions)
             {
-                lastResult = subExpression.Parse(inputTokens, startPosition);
+                lastResult = subExpression.Parse(inputTokens, startIndex);
                 if (lastResult.Succeed)
                 {
                     break;
@@ -42,9 +42,9 @@ namespace Trs.PegParser.Grammer.Operators
             }
             if (lastResult == null)
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParsePosition, lastResult.MatchedTokens, 
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, 
                 _matchAction(lastResult.MatchedTokens, new[] { lastResult.SemanticActionResult }));
         }
 

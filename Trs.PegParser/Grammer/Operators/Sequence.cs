@@ -41,9 +41,9 @@ namespace Trs.PegParser.Grammer.Operators
             return noneTerminalNames;
         }        
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
-            int nextParsePosition = startPosition;
+            int nextParsePosition = startIndex;
             int totalMatchLength = 0;
             var subActionResults = new List<TActionResult>();
             foreach (var sequenceElement in _sequenceDefinition)
@@ -55,11 +55,11 @@ namespace Trs.PegParser.Grammer.Operators
                     return currentResult;
                 }
                 subActionResults.Add(currentResult.SemanticActionResult);
-                nextParsePosition = currentResult.NextParsePosition;
+                nextParsePosition = currentResult.NextParseStartIndex;
                 totalMatchLength += currentResult.MatchedTokens.MatchedIndices.Length;
             }
             TActionResult actionResult = default;
-            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, totalMatchLength));
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, totalMatchLength));
             if (_matchAction != null)
             {
                 actionResult = _matchAction(match, subActionResults);

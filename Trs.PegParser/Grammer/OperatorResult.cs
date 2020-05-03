@@ -13,7 +13,7 @@ namespace Trs.PegParser.Grammer
         /// <summary>
         /// Where to parse from next.
         /// </summary>
-        public int NextParsePosition { get; }
+        public int NextParseStartIndex { get; }
 
         /// <summary>
         /// Range of tokens matched.
@@ -25,17 +25,17 @@ namespace Trs.PegParser.Grammer
         /// </summary>
         public TActionResult SemanticActionResult { get; }
 
-        private ParseResult(bool succeed, int nextParsePosition, TokensMatch<TTokenTypeName> matchedTokens = null, TActionResult semanticActionResult = default)
-            => (NextParsePosition, Succeed, MatchedTokens, SemanticActionResult) = (nextParsePosition, succeed, matchedTokens, semanticActionResult);
+        private ParseResult(bool succeed, int nextParseStartIndex, TokensMatch<TTokenTypeName> matchedTokens = null, TActionResult semanticActionResult = default)
+            => (NextParseStartIndex, Succeed, MatchedTokens, SemanticActionResult) = (nextParseStartIndex, succeed, matchedTokens, semanticActionResult);
 
         public static ParseResult<TTokenTypeName, TActionResult>
-            Succeeded(int nextParsePosition, TokensMatch<TTokenTypeName> matchedTokens, TActionResult semanticActionResult)
-                => new ParseResult<TTokenTypeName, TActionResult>(true, nextParsePosition, matchedTokens, semanticActionResult);
+            Succeeded(int nextParseStartIndex, TokensMatch<TTokenTypeName> matchedTokens, TActionResult semanticActionResult)
+                => new ParseResult<TTokenTypeName, TActionResult>(true, nextParseStartIndex, matchedTokens, semanticActionResult);
 
         public static ParseResult<TTokenTypeName, TActionResult>
-            Failed(int nextParsePosition)
+            Failed(int nextParseStartIndex)
             
-                => new ParseResult<TTokenTypeName, TActionResult>(false, nextParsePosition);
+                => new ParseResult<TTokenTypeName, TActionResult>(false, nextParseStartIndex);
 
     }
 }

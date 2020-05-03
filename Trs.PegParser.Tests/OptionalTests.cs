@@ -44,6 +44,7 @@ namespace Trs.PegParser.Tests
             Assert.Null(subActionResults);            
             Assert.Equal(new MatchRange(0, 0), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(testInput, parseResult.SemanticActionResult);
+            Assert.Equal(0, parseResult.NextParseStartIndex);
         }
 
         [Fact]
@@ -67,6 +68,7 @@ namespace Trs.PegParser.Tests
             Assert.Equal(testInput, subActionResults.Single());
             Assert.Equal(new MatchRange(0, 1), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(testInput, parseResult.SemanticActionResult);
+            Assert.Equal(1, parseResult.NextParseStartIndex);
         }
     }
 }

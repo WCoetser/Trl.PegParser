@@ -50,7 +50,7 @@ namespace Trs.PegParser.Tests
             Assert.Equal("bbb", subActionResults[1]);
             Assert.True(parseResult.Succeed);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
-            Assert.Equal(2, parseResult.NextParsePosition);
+            Assert.Equal(2, parseResult.NextParseStartIndex);
         }
 
         [Fact]

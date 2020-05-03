@@ -19,24 +19,24 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => Enumerable.Empty<TNoneTerminalName>();
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
         {
             // Note: It is possible to match the empty string at the end of the input tokens,
             // therefore this is > instead of >=. An example of this happening is when the 
             // input tokens length = 0.
-            if (startPosition > inputTokens.Count)
+            if (startIndex > inputTokens.Count)
             {
-                return ParseResult<TTokenTypeName, TActionResult>.Failed(startPosition);
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
 
             TActionResult actionResult = default;
-            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startPosition, 0));
+            var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
             if (_matchAction != null)
             {
                 // Terminals cannot have sub-results, therefore pass null
                 actionResult = _matchAction(match, null);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startPosition, match, actionResult);
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, match, actionResult);
         }
 
         void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)

@@ -18,8 +18,8 @@ namespace Trs.PegParser.Grammer
         /// This methed is used to execute the actual parsing of the input tokens and to execute semantic actions.
         /// </summary>
         /// <param name="inputTokens">The input tokens</param>
-        /// <param name="startPosition">Start index in the inputTokens to parse from.</param>
-        ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startPosition);
+        /// <param name="startIndex">Start index in the inputTokens to parse from.</param>
+        ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex);
 
         /// <summary>
         /// This needs to be done in order to execute parsing.
