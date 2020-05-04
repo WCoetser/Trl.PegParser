@@ -17,7 +17,6 @@ namespace Trs.PegParser.Grammer.Operators
             SemanticAction<TActionResult, TTokenTypeName> matchAction)
         => (_subExpression, _matchAction) = (subExpression, matchAction);
 
-
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
 
@@ -39,6 +38,7 @@ namespace Trs.PegParser.Grammer.Operators
                     nextParseIndex = lastResult.NextParseStartIndex;
                     subResults.Add(lastResult.SemanticActionResult);
                 }
+                // Prevent non-termination in case empty string is matched
                 if (previousNextParseIndex == nextParseIndex)
                 {
                     break;

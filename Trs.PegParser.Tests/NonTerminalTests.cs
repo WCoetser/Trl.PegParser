@@ -8,7 +8,7 @@ namespace Trs.PegParser.Tests
 {
     public class NonTerminalTests
     {
-        public readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         TokensMatch<TokenNames> tokens;
         List<string> _subResults = null;
 

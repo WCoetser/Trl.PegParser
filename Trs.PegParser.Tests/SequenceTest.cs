@@ -9,13 +9,12 @@ namespace Trs.PegParser.Tests
 {
     public class SequenceTest
     {
-        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         private TokensMatch<TokenNames> matchedTokenRangeAssert = null;
         private List<string> subActionResults = null;
 
         public SequenceTest()
         {
-            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var extractValueSequence = peg.SemanticAction((matchedTokenRange, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol

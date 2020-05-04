@@ -8,7 +8,7 @@ namespace Trs.PegParser.Tests
 {
     public class OrderedChoiceTests
     {
-        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         private TokensMatch<TokenNames> matchedTokens;
 
         public OrderedChoiceTests()

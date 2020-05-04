@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Grammer.Operators;
 using Trs.PegParser.Tokenization;
@@ -27,11 +28,15 @@ namespace Trs.PegParser
         private SemanticAction<TActionResult, TTokenTypeName> _defaultOptionalAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultOrderedChoiceAction;
         private SemanticAction<TActionResult, TTokenTypeName> _defaultZeroOrMoreAction;
+        private SemanticAction<TActionResult, TTokenTypeName> _defaultOneOrMoreAction;
 
         private Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal
             = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
 
         // ==================== Semantic actions
+
+        public void SetDefaultOneOrMoreAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
+        => _defaultOneOrMoreAction = semanticAction;        
 
         public void SetDefaultZeroOrMoreAction(SemanticAction<TActionResult, TTokenTypeName> semanticAction)
         => _defaultZeroOrMoreAction = semanticAction;
@@ -59,6 +64,13 @@ namespace Trs.PegParser
         => new ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>(ruleHead, ruleBody);
 
         // ==================== Parsing operators
+
+        public OneOrMore<TTokenTypeName, TNonTerminalName, TActionResult> OneOrMore(
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
+        {
+            var matchAction = semanticAction ?? _defaultOneOrMoreAction;
+            return new OneOrMore<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression, matchAction);
+        }
 
         public ZeroOrMore<TTokenTypeName, TNonTerminalName, TActionResult> ZeroOrMore(
             IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
@@ -120,6 +132,9 @@ namespace Trs.PegParser
         => OrderedChoice(orderedChoices, null);
 
         // ==================== The rest
+
+        public TokenDefinition<TTokenTypeName> Token(TTokenTypeName tokenName, Regex tokenDefinition)
+        => new TokenDefinition<TTokenTypeName>(tokenName, tokenDefinition);
 
         public Tokenizer<TTokenTypeName> Tokenizer(IEnumerable<TokenDefinition<TTokenTypeName>> prioritizedTokenDefinitions)
         => new Tokenizer<TTokenTypeName>(prioritizedTokenDefinitions);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -6,16 +7,15 @@ using Xunit;
 
 namespace Trs.PegParser.Tests
 {
-    public class ZeroOrMoreTests
+    public class OneOrMoreTests
     {
         private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         private IEnumerable<string> subActionResults = null;
         private TokensMatch<TokenNames> matchedTokens = null;
 
-        public ZeroOrMoreTests()
+        public OneOrMoreTests()
         {
-            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            peg.SetDefaultZeroOrMoreAction((tokensMatch, subResults) =>
+            peg.SetDefaultOneOrMoreAction((tokensMatch, subResults) =>
             {
                 matchedTokens = tokensMatch;
                 subActionResults = subResults;
@@ -27,13 +27,13 @@ namespace Trs.PegParser.Tests
         }
 
         [Fact]
-        public void ShouldParseRepitition()
+        public void ShouldParseSequence()
         {
             // Arrange
             var inputString = "aaabbbaaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
+                peg.Rule(ParsingRuleNames.Start, peg.OneOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
             });
 
             // Act
@@ -53,12 +53,13 @@ namespace Trs.PegParser.Tests
         }
 
         [Fact]
-        public void ShouldParseEmptyCase() {
+        public void ShouldParseSingleElement()
+        {
             // Arrange
-            var inputString = string.Empty;
+            var inputString = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
+                peg.Rule(ParsingRuleNames.Start, peg.OneOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
             });
 
             // Act
@@ -67,10 +68,12 @@ namespace Trs.PegParser.Tests
 
             // Assert
             Assert.True(parseResult.Succeed);
-            Assert.Equal(0, parseResult.NextParseStartIndex);
+            Assert.Equal(1, parseResult.NextParseStartIndex);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
-            Assert.Equal(new MatchRange(0, 0), matchedTokens.MatchedIndices);
-            Assert.Empty(subActionResults);
+            Assert.Equal(new MatchRange(0, 1), matchedTokens.MatchedIndices);
+            var subResultList = subActionResults.ToList();
+            Assert.Single(subResultList);
+            Assert.Equal("aaa", subResultList[0]);
         }
 
         [Fact]
@@ -80,7 +83,7 @@ namespace Trs.PegParser.Tests
             var inputString = string.Empty;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.EmptyString()))
+                peg.Rule(ParsingRuleNames.Start, peg.OneOrMore(peg.EmptyString()))
             });
 
             // Act

@@ -6,12 +6,11 @@ namespace Trs.PegParser.Tests
 {
     public class EmptyStringTests
     {
-        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         private IEnumerable<string> subActionResults = null;
 
         public EmptyStringTests()
         {
-            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var extractValue = peg.SemanticAction((tokensMatch, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol

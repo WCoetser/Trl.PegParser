@@ -8,7 +8,7 @@ namespace Trs.PegParser.Tests
 {
     public class OptionalTests
     {
-        PegFacade<TokenNames, ParsingRuleNames, string> peg;
+        private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
         private TokensMatch<TokenNames> matchedTokenRangeAssert = null;
         private IEnumerable<string> subActionResults = null;
 
