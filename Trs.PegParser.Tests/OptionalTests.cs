@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -15,13 +16,14 @@ namespace Trs.PegParser.Tests
         public OptionalTests()
         {
             peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            peg.SetDefaultTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
-            peg.SetDefaultOptionalAction((matchedTokenRange, subResults) =>
+            var semanticActions = peg.DefaultSemanticActions;
+            semanticActions.SetTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
+            semanticActions.OptionalAction = (matchedTokenRange, subResults) =>
             {
                 matchedTokenRangeAssert = matchedTokenRange;
                 subActionResults = subResults;
                 return matchedTokenRange.GetMatchedString();
-            });
+            };
         }
 
         [Fact]
@@ -29,10 +31,11 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string testInput = string.Empty;
+            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
             var parser = peg.Parser(ParsingRuleNames.Start, new[]
             {
-                peg.Rule(ParsingRuleNames.Start, peg.Optional(peg.Terminal(TokenNames.A)))
+                peg.Rule(ParsingRuleNames.Start, op.Optional(op.Terminal(TokenNames.A)))
             });
 
             // Act
@@ -53,9 +56,10 @@ namespace Trs.PegParser.Tests
             // Arrange
             string testInput = "aaaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new []
             {
-                peg.Rule(ParsingRuleNames.Start, peg.Optional(peg.Terminal(TokenNames.A)))
+                peg.Rule(ParsingRuleNames.Start, op.Optional(op.Terminal(TokenNames.A)))
             });
 
             // Act
@@ -69,6 +73,12 @@ namespace Trs.PegParser.Tests
             Assert.Equal(new MatchRange(0, 1), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(testInput, parseResult.SemanticActionResult);
             Assert.Equal(1, parseResult.NextParseStartIndex);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

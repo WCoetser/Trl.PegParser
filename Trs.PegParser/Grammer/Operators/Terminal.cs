@@ -20,7 +20,7 @@ namespace Trs.PegParser.Grammer.Operators
             => Enumerable.Empty<TNoneTerminalName>();
         
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
-            int startIndex)
+            int startIndex, bool mustConsumeTokens)
         {
             if (startIndex >= inputTokens.Count 
                 || !(inputTokens[startIndex].TokenName.Equals(_expectedToken)))
@@ -29,7 +29,7 @@ namespace Trs.PegParser.Grammer.Operators
             }
             TActionResult actionResult = default;
             var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 1));
-            if (_matchAction != null)
+            if (_matchAction != null && mustConsumeTokens)
             {
                 actionResult = _matchAction(match, Enumerable.Empty<TActionResult>());
             }

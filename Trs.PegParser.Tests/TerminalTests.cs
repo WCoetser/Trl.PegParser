@@ -11,14 +11,15 @@ namespace Trs.PegParser.Tests
         private IEnumerable<string> subActionResults = Array.Empty<string>();
 
         public TerminalTests()
-        {            
-            var extractValue = peg.SemanticAction((tokensMatch, subResults) =>
+        {
+            var semanticActions = peg.DefaultSemanticActions;
+            var extractValue = semanticActions.SemanticAction((tokensMatch, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
                 subActionResults = subResults;
                 return tokensMatch.GetMatchedString();
             });
-            peg.SetDefaultTerminalAction(TokenNames.A, extractValue);
+            semanticActions.SetTerminalAction(TokenNames.A, extractValue);
         }
 
         [Fact]
@@ -27,8 +28,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.TerminalTest, new[] { 
-                peg.Rule(ParsingRuleNames.TerminalTest, peg.Terminal(TokenNames.A)),
+                peg.Rule(ParsingRuleNames.TerminalTest, op.Terminal(TokenNames.A)),
             });
 
             // Act
@@ -47,13 +49,20 @@ namespace Trs.PegParser.Tests
         public void ShouldNotReturnNonTerminalNamesForValidationChecks()
         {
             // Arrange
-            var terminal = peg.Terminal(TokenNames.A);
+            var op = peg.Operators;
+            var terminal = op.Terminal(TokenNames.A);
 
             // Act
             var nonTerminalNames = terminal.GetNonTerminalNames();
 
             // Assert
             Assert.Empty(nonTerminalNames);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

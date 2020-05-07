@@ -22,15 +22,15 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
         
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             TActionResult semanticResult = default;
 
             // Optional: sub expression matches
-            var result = _subExpression.Parse(inputTokens, startIndex);
+            var result = _subExpression.Parse(inputTokens, startIndex, mustConsumeTokens);
             if (result.Succeed)
             {
-                if (_matchAction != null)
+                if (_matchAction != null && mustConsumeTokens)
                 {
                     semanticResult = _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult });
                 }
@@ -43,7 +43,7 @@ namespace Trs.PegParser.Grammer.Operators
                 return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
             }
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
-            if (_matchAction != null)
+            if (_matchAction != null && mustConsumeTokens)
             {
                 semanticResult = _matchAction(matchedTokens, Enumerable.Empty<TActionResult>());
             }

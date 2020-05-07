@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -14,14 +15,14 @@ namespace Trs.PegParser.Tests
 
         public NonTerminalTests()
         {
-            peg.SetDefaultTerminalAction(TokenNames.A, (matchedTokens, _) => matchedTokens.GetMatchedString());
-            peg.SetDefaultNonTerminalAction(ParsingRuleNames.NonTerminalA, (matchedTokens, subResults) =>
+            var semanticActions = peg.DefaultSemanticActions;
+            semanticActions.SetTerminalAction(TokenNames.A, (matchedTokens, _) => matchedTokens.GetMatchedString());
+            semanticActions.SetNonTerminalAction(ParsingRuleNames.NonTerminalA, (matchedTokens, subResults) =>
             {
                 this.tokens = matchedTokens;
                 _subResults = subResults.ToList();
                 return subResults.First();
             });
-
         }
 
         [Fact]
@@ -29,10 +30,11 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string inputString = "aaaa";
+            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.NonTerminal(ParsingRuleNames.NonTerminalA)),
-                peg.Rule(ParsingRuleNames.NonTerminalA, peg.Terminal(TokenNames.A))
+                peg.Rule(ParsingRuleNames.Start, op.NonTerminal(ParsingRuleNames.NonTerminalA)),
+                peg.Rule(ParsingRuleNames.NonTerminalA, op.Terminal(TokenNames.A))
             });
 
             // Act
@@ -51,19 +53,26 @@ namespace Trs.PegParser.Tests
         public void ShouldSubstituteRuleBodyOnParserAssign()
         {
             // Arrange
-            var testNonTerminal = peg.NonTerminal(ParsingRuleNames.NonTerminalA);
+            var op = peg.Operators;
+            var testNonTerminal = op.NonTerminal(ParsingRuleNames.NonTerminalA);
 
             // Act
             bool before = ((IParsingOperatorExecution<TokenNames, ParsingRuleNames, string>)testNonTerminal).HasNonTerminalParsingRuleBodies;
             peg.Parser(ParsingRuleNames.Start, new[] {
                 peg.Rule(ParsingRuleNames.Start, testNonTerminal),
-                peg.Rule(ParsingRuleNames.NonTerminalA, peg.Terminal(TokenNames.A))
+                peg.Rule(ParsingRuleNames.NonTerminalA, op.Terminal(TokenNames.A))
             });
             bool after = ((IParsingOperatorExecution<TokenNames, ParsingRuleNames, string>)testNonTerminal).HasNonTerminalParsingRuleBodies;
 
             // Assert
             Assert.False(before);
             Assert.True(after);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

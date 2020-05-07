@@ -35,13 +35,13 @@ namespace Trs.PegParser.Grammer.Operators
         bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
             => _ruleBody != null;
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
-            var parseResult = _ruleBody.Parse(inputTokens, startIndex);
+            var parseResult = _ruleBody.Parse(inputTokens, startIndex, mustConsumeTokens);
             TActionResult semanticActionResult = default;
             if (parseResult.Succeed)
             {
-                if (_matchAction != null)
+                if (_matchAction != null && mustConsumeTokens)
                 {
                     semanticActionResult = _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });
                 }

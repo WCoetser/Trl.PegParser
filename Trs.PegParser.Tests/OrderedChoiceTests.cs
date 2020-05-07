@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -14,10 +15,11 @@ namespace Trs.PegParser.Tests
         public OrderedChoiceTests()
         {
             peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            peg.SetDefaultOrderedChoiceAction((matchedTokens, subResults) => {
+            var semanticActions = peg.DefaultSemanticActions;
+            semanticActions.OrderedChoiceAction = (matchedTokens, subResults) => {
                 this.matchedTokens = matchedTokens;
                 return subResults.First();
-            });
+            };
         }
 
         [Fact]
@@ -26,8 +28,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             string input = "bbb";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B, (m, _) => m.GetMatchedString())))
+                peg.Rule(ParsingRuleNames.Start, op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B, (m, _) => m.GetMatchedString())))
             });
 
             // Act
@@ -47,8 +50,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             string input = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.OrderedChoice(peg.Terminal(TokenNames.A, (m, _) => m.GetMatchedString()), peg.Terminal(TokenNames.B)))
+                peg.Rule(ParsingRuleNames.Start, op.OrderedChoice(op.Terminal(TokenNames.A, (m, _) => m.GetMatchedString()), op.Terminal(TokenNames.B)))
             });
 
             // Act
@@ -60,6 +64,12 @@ namespace Trs.PegParser.Tests
             Assert.Equal(input, parseResult.SemanticActionResult);
             Assert.Equal(new MatchRange(0, 1), matchedTokens.MatchedIndices);
             Assert.Equal(1, parseResult.NextParseStartIndex);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

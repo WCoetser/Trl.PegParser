@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -14,16 +15,17 @@ namespace Trs.PegParser.Tests
 
         public ZeroOrMoreTests()
         {
+            var semanticActions = peg.DefaultSemanticActions;
             peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
-            peg.SetDefaultZeroOrMoreAction((tokensMatch, subResults) =>
+            semanticActions.ZeroOrMoreAction = (tokensMatch, subResults) =>
             {
                 matchedTokens = tokensMatch;
                 subActionResults = subResults;
                 return tokensMatch.GetMatchedString();
-            });
-            peg.SetDefaultTerminalAction(TokenNames.A, (match, _) => match.GetMatchedString());
-            peg.SetDefaultTerminalAction(TokenNames.B, (match, _) => match.GetMatchedString());
-            peg.SetDefaultOrderedChoiceAction((_, subResults) => subResults.Single());
+            };
+            semanticActions.SetTerminalAction(TokenNames.A, (match, _) => match.GetMatchedString());
+            semanticActions.SetTerminalAction(TokenNames.B, (match, _) => match.GetMatchedString());
+            semanticActions.OrderedChoiceAction = (_, subResults) => subResults.Single();
         }
 
         [Fact]
@@ -32,8 +34,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = "aaabbbaaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
+                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B))))
             });
 
             // Act
@@ -57,8 +60,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = string.Empty;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.OrderedChoice(peg.Terminal(TokenNames.A), peg.Terminal(TokenNames.B))))
+                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B))))
             });
 
             // Act
@@ -79,8 +83,9 @@ namespace Trs.PegParser.Tests
             // Repetition on the empty string operator could cause non-termination if not covered
             var inputString = string.Empty;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var op = peg.Operators;
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.ZeroOrMore(peg.EmptyString()))
+                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.EmptyString()))
             });
 
             // Act
@@ -95,6 +100,12 @@ namespace Trs.PegParser.Tests
             var subResultList = subActionResults.ToList();
             Assert.Single(subResultList);
             Assert.Null(subResultList[0]);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

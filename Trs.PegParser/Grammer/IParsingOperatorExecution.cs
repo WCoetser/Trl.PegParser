@@ -19,7 +19,8 @@ namespace Trs.PegParser.Grammer
         /// </summary>
         /// <param name="inputTokens">The input tokens</param>
         /// <param name="startIndex">Start index in the inputTokens to parse from.</param>
-        ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex);
+        /// <param name="mustConsumeTokens">Indicates whether semantic actions must execute when a token is matched.</param>
+        ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens);
 
         /// <summary>
         /// This needs to be done in order to execute parsing.

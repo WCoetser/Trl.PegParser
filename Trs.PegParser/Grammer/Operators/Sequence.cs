@@ -41,14 +41,14 @@ namespace Trs.PegParser.Grammer.Operators
             return noneTerminalNames;
         }        
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             int nextParsePosition = startIndex;
             int totalMatchLength = 0;
             var subActionResults = new List<TActionResult>();
             foreach (var sequenceElement in _sequenceDefinition)
             {
-                var currentResult = sequenceElement.Parse(inputTokens, nextParsePosition);
+                var currentResult = sequenceElement.Parse(inputTokens, nextParsePosition, mustConsumeTokens);
                 // TODO: Adaptive parsing - skip failed sub results
                 if (!currentResult.Succeed)
                 {
@@ -60,7 +60,7 @@ namespace Trs.PegParser.Grammer.Operators
             }
             TActionResult actionResult = default;
             var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, totalMatchLength));
-            if (_matchAction != null)
+            if (_matchAction != null && mustConsumeTokens)
             {
                 actionResult = _matchAction(match, subActionResults);
             }

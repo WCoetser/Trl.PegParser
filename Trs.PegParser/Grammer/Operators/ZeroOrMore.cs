@@ -20,7 +20,7 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             ParseResult<TTokenTypeName, TActionResult> lastResult;
             int nextParseIndex = startIndex;
@@ -30,7 +30,7 @@ namespace Trs.PegParser.Grammer.Operators
             List<TActionResult> subResults = new List<TActionResult>();
             do
             {
-                lastResult = _subExpression.Parse(inputTokens, nextParseIndex);
+                lastResult = _subExpression.Parse(inputTokens, nextParseIndex, mustConsumeTokens);
                 if (lastResult.Succeed)
                 {
                     totalMatchLength += lastResult.MatchedTokens.MatchedIndices.Length;
@@ -48,7 +48,7 @@ namespace Trs.PegParser.Grammer.Operators
             // This will always succeed, because it also accepts the empty case
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, totalMatchLength));
             TActionResult semanticResult = default;
-            if (_matchAction != null)
+            if (_matchAction != null && mustConsumeTokens)
             {
                 semanticResult = _matchAction(matchedTokens, subResults.AsReadOnly());
             }

@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Trs.PegParser.Tests
 {
@@ -32,6 +33,12 @@ namespace Trs.PegParser.Tests
 
             // Assert
             Assert.Equal(lhsHash, rhsHash);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

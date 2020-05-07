@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Trs.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -11,13 +12,13 @@ namespace Trs.PegParser.Tests
 
         public EmptyStringTests()
         {
-            var extractValue = peg.SemanticAction((tokensMatch, subResults) =>
+            var semanticActions = peg.DefaultSemanticActions;
+            semanticActions.EmptyStringAction = (tokensMatch, subResults) =>
             {
                 // Extract string result of matching the Terminal symbol
                 subActionResults = subResults;
                 return tokensMatch.GetMatchedString();
-            });
-            peg.SetDefaultEmptyStringAction(extractValue);
+            };
         }
 
         [Fact]
@@ -25,9 +26,10 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string inputString = string.Empty;
+            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
             var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, peg.EmptyString()),
+                peg.Rule(ParsingRuleNames.Start, op.EmptyString()),
             });
 
             // Act
@@ -40,6 +42,12 @@ namespace Trs.PegParser.Tests
             Assert.True(parseResult.Succeed);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
             Assert.Equal(0, parseResult.NextParseStartIndex);
+        }
+
+        [Fact]
+        public void PredicateMustNotConsumeTokens()
+        {
+            throw new NotImplementedException();
         }
     }
 }

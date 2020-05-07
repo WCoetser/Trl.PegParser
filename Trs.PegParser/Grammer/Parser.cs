@@ -77,7 +77,7 @@ namespace Trs.PegParser.Grammer
                 return ParseResult<TTokenTypeName, TSemanticActionResult>.Failed(0);
             }
 
-            var parseResult = _grammerRules[_startSymbol].Parse(tokenizationResult.MatchedRanges, 0);
+            var parseResult = _grammerRules[_startSymbol].Parse(tokenizationResult.MatchedRanges, 0, true);
             // Test for extra input at end of input
             if (parseResult.Succeed && parseResult.NextParseStartIndex != tokenizationResult.MatchedRanges.Count)
             {

@@ -19,7 +19,7 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => Enumerable.Empty<TNoneTerminalName>();
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex)
+        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             // Note: It is possible to match the empty string at the end of the input tokens,
             // therefore this is > instead of >=. An example of this happening is when the 
@@ -31,7 +31,7 @@ namespace Trs.PegParser.Grammer.Operators
 
             TActionResult actionResult = default;
             var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
-            if (_matchAction != null)
+            if (_matchAction != null && mustConsumeTokens)
             {
                 // Terminals cannot have sub-results, therefore pass null
                 actionResult = _matchAction(match, Enumerable.Empty<TActionResult>());
