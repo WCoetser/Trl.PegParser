@@ -6,7 +6,7 @@
     <!-- BEGIN NUGET METADATA -->
 
     <PackageId>Trs.PegParser</PackageId>
-    <Version>1.0.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Wikus Coetser</Authors>
     <Company></Company>
     <Title>Tokenizer And PEG Parser</Title>
