@@ -97,11 +97,5 @@ namespace Trs.PegParser.Tests
             Assert.Equal(1, tokenizationResult.UnmatchedRanges.Count);
             Assert.Equal(new MatchRange(0, 4), tokenizationResult.UnmatchedRanges[0]);
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

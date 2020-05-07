@@ -58,11 +58,5 @@ namespace Trs.PegParser.Tests
             // Assert
             Assert.Empty(nonTerminalNames);
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

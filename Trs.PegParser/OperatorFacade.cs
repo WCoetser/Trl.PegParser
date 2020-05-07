@@ -23,6 +23,14 @@ namespace Trs.PegParser
             return new OneOrMore<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression, matchAction);
         }
 
+        public NotPredicate<TTokenTypeName, TNonTerminalName, TActionResult> NotPredicate(
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression)
+        => new NotPredicate<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression);
+
+        public AndPredicate<TTokenTypeName, TNonTerminalName, TActionResult> AndPredicate(
+            IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression)
+        => new AndPredicate<TTokenTypeName, TNonTerminalName, TActionResult>(subExpression);
+
         public ZeroOrMore<TTokenTypeName, TNonTerminalName, TActionResult> ZeroOrMore(
             IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression, SemanticAction<TActionResult, TTokenTypeName> semanticAction = null)
         {

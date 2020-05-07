@@ -39,12 +39,11 @@ namespace Trs.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, match, actionResult);
         }
 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
             // Nothing to do here - empty string has no non-terminals
         }
 
-        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
-            => false;
+        public bool HasNonTerminalParsingRuleBodies => false;
     }
 }

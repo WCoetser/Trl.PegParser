@@ -10,22 +10,34 @@ namespace Trs.PegParser.Grammer.Operators
         where TTokenTypeName : Enum
         where TNoneTerminalName : Enum
     {
-        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
+        private IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _subExpression;
+
+        public AndPredicate(IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> subExpression)
         {
-            throw new NotImplementedException();
+            _subExpression = subExpression;
         }
+
+        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
+        => _subExpression.GetNonTerminalNames();
 
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
-            throw new NotImplementedException();
+            var parseResult = _subExpression.Parse(inputTokens, startIndex, false);
+            if (!parseResult.Succeed)
+            {
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
+            }
+            // Note: Predicates do not trigger semantic actions or consume tokens
+            return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex,
+                new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0)), default);
         }
 
         public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
-            throw new NotImplementedException();
+            _subExpression.SetNonTerminalParsingRuleBody(ruleBodies);
         }
-
-        public bool HasNonTerminalParsingRuleBodies 
-            => throw new NotImplementedException();        
+        
+        public bool HasNonTerminalParsingRuleBodies
+        => _subExpression.HasNonTerminalParsingRuleBodies;
     }
 }

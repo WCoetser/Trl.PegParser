@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Tests.TestFixtures;
@@ -67,12 +66,6 @@ namespace Trs.PegParser.Tests
             // Assert
             Assert.False(before);
             Assert.True(after);
-        }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
         }
     }
 }

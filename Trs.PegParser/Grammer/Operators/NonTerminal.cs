@@ -26,14 +26,13 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
             => new[] { _noneTerminalName };
                 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.SetNonTerminalParsingRuleBody(
-                IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetNonTerminalParsingRuleBody(
+            IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
             _ruleBody = ruleBodies[_noneTerminalName];
         }
 
-        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
-            => _ruleBody != null;
+        public bool HasNonTerminalParsingRuleBodies => _ruleBody != null;
 
         public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {

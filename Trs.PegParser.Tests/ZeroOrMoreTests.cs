@@ -16,7 +16,6 @@ namespace Trs.PegParser.Tests
         public ZeroOrMoreTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             semanticActions.ZeroOrMoreAction = (tokensMatch, subResults) =>
             {
                 matchedTokens = tokensMatch;
@@ -100,12 +99,6 @@ namespace Trs.PegParser.Tests
             var subResultList = subActionResults.ToList();
             Assert.Single(subResultList);
             Assert.Null(subResultList[0]);
-        }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
         }
     }
 }

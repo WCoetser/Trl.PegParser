@@ -53,8 +53,7 @@ namespace Trs.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, actionResult);
         }
 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>
-            .SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
             foreach (var subExpression in _choiceSubExpressions)
             {
@@ -62,7 +61,7 @@ namespace Trs.PegParser.Grammer.Operators
             }
         }
 
-        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
+        public bool HasNonTerminalParsingRuleBodies
             => _choiceSubExpressions.Any(e => e.HasNonTerminalParsingRuleBodies);
     }
 }

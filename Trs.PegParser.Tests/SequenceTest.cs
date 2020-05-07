@@ -67,11 +67,5 @@ namespace Trs.PegParser.Tests
             var testSet = new HashSet<ParsingRuleNames>(new[] { ParsingRuleNames.Head, ParsingRuleNames.Tail });
             Assert.True(testSet.SetEquals(nonTerminals));
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

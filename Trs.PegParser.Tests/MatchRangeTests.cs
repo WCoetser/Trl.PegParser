@@ -34,11 +34,5 @@ namespace Trs.PegParser.Tests
             // Assert
             Assert.Equal(lhsHash, rhsHash);
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -43,11 +43,5 @@ namespace Trs.PegParser.Tests
             Assert.Equal(inputString, parseResult.SemanticActionResult);
             Assert.Equal(0, parseResult.NextParseStartIndex);
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

@@ -60,13 +60,12 @@ namespace Trs.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(nextParseIndex, matchedTokens, semanticResult);
         }
 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>
-            .SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
             _subExpression.SetNonTerminalParsingRuleBody(ruleBodies);
         }
 
-        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
+        public bool HasNonTerminalParsingRuleBodies
             => _subExpression.HasNonTerminalParsingRuleBodies;
     }
 }

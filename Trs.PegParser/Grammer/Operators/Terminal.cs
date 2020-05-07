@@ -36,8 +36,7 @@ namespace Trs.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex + 1, match, actionResult);
         }
 
-        void IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>
-            .SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
             // Nothing to do here - terminals do not contain non-terminals.
         }
@@ -45,7 +44,6 @@ namespace Trs.PegParser.Grammer.Operators
         /// <summary>
         /// Terminals do not contain non-terminals, therefore this is always false.
         /// </summary>
-        bool IParsingOperatorExecution<TTokenTypeName, TNoneTerminalName, TActionResult>.HasNonTerminalParsingRuleBodies
-            => false;
+        public bool HasNonTerminalParsingRuleBodies => false;
     }
 }

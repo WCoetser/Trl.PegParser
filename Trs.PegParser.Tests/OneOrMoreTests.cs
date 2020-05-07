@@ -103,11 +103,5 @@ namespace Trs.PegParser.Tests
             Assert.Single(subResultList);
             Assert.Null(subResultList[0]);
         }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

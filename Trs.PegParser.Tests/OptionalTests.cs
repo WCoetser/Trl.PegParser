@@ -15,7 +15,6 @@ namespace Trs.PegParser.Tests
 
         public OptionalTests()
         {
-            peg = new PegFacade<TokenNames, ParsingRuleNames, string>();
             var semanticActions = peg.DefaultSemanticActions;
             semanticActions.SetTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
             semanticActions.OptionalAction = (matchedTokenRange, subResults) =>
@@ -73,12 +72,6 @@ namespace Trs.PegParser.Tests
             Assert.Equal(new MatchRange(0, 1), matchedTokenRangeAssert.MatchedIndices);
             Assert.Equal(testInput, parseResult.SemanticActionResult);
             Assert.Equal(1, parseResult.NextParseStartIndex);
-        }
-
-        [Fact]
-        public void PredicateMustNotConsumeTokens()
-        {
-            throw new NotImplementedException();
         }
     }
 }
