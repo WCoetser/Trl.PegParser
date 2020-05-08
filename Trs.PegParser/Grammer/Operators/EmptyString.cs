@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Trs.PegParser.Tokenization;
 
@@ -19,8 +18,12 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => Enumerable.Empty<TNoneTerminalName>();
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
+        public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
+            if (inputTokens == null) {
+                throw new ArgumentNullException(nameof(inputTokens));
+            }
+
             // Note: It is possible to match the empty string at the end of the input tokens,
             // therefore this is > instead of >=. An example of this happening is when the 
             // input tokens length = 0.

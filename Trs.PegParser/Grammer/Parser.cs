@@ -15,6 +15,11 @@ namespace Trs.PegParser.Grammer
         public Parser(TNonTerminalName startSymbol, 
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules) {
 
+            if (grammerRules == null)
+            {
+                throw new ArgumentNullException(nameof(grammerRules));
+            }
+
             ValidateGrammer(startSymbol, grammerRules);
 
             _startSymbol = startSymbol;
@@ -72,6 +77,11 @@ namespace Trs.PegParser.Grammer
 
         public ParseResult<TTokenTypeName, TSemanticActionResult> Parse(TokenizationResult<TTokenTypeName> tokenizationResult)
         {
+            if (tokenizationResult == null)
+            {
+                throw new ArgumentNullException(nameof(tokenizationResult));
+            }
+
             if (!tokenizationResult.Succeed)
             {
                 return ParseResult<TTokenTypeName, TSemanticActionResult>.Failed(0);

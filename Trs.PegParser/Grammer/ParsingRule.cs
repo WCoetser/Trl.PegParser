@@ -24,10 +24,7 @@ namespace Trs.PegParser.Grammer
 
         public ParsingRule(TNonTerminalName ruleIdentifier, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> parsingExpression)
         {
-            if (parsingExpression == null)
-            {
-                throw new ArgumentNullException(nameof(parsingExpression), "Rule body may not be null.");
-            }
+            _ = parsingExpression ?? throw new ArgumentNullException(nameof(parsingExpression), "Rule body may not be null.");
 
             RuleIdentifier = ruleIdentifier;
             ParsingExpression = parsingExpression;            

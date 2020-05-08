@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.Grammer.Operators
@@ -10,7 +9,7 @@ namespace Trs.PegParser.Grammer.Operators
         where TTokenTypeName : Enum
         where TNoneTerminalName : Enum
     {
-        private IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _subExpression;
+        private readonly IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _subExpression;
 
         public NotPredicate(IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> subExpression)
         {
@@ -20,7 +19,7 @@ namespace Trs.PegParser.Grammer.Operators
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
+        public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             var parseResult = _subExpression.Parse(inputTokens, startIndex, false);
             if (parseResult.Succeed)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.Grammer.Operators
@@ -29,12 +28,17 @@ namespace Trs.PegParser.Grammer.Operators
         public void SetNonTerminalParsingRuleBody(
             IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
         {
+            if (ruleBodies == null)
+            {
+                throw new ArgumentNullException(nameof(ruleBodies));
+            }
+
             _ruleBody = ruleBodies[_noneTerminalName];
         }
 
         public bool HasNonTerminalParsingRuleBodies => _ruleBody != null;
 
-        public ParseResult<TTokenTypeName, TActionResult> Parse([NotNull] IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
+        public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
             var parseResult = _ruleBody.Parse(inputTokens, startIndex, mustConsumeTokens);
             TActionResult semanticActionResult = default;

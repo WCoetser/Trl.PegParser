@@ -22,6 +22,11 @@ namespace Trs.PegParser.Grammer.Operators
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
             int startIndex, bool mustConsumeTokens)
         {
+            if (inputTokens == null)
+            {
+                throw new ArgumentNullException(nameof(inputTokens));
+            }
+
             if (startIndex >= inputTokens.Count 
                 || !(inputTokens[startIndex].TokenName.Equals(_expectedToken)))
             {

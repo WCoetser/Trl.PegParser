@@ -9,7 +9,6 @@ namespace Trs.PegParser.Tests
     public class NonTerminalTests
     {
         private readonly PegFacade<TokenNames, ParsingRuleNames, string> peg = Peg.Facade();
-        TokensMatch<TokenNames> tokens;
         List<string> _subResults = null;
 
         public NonTerminalTests()
@@ -18,7 +17,6 @@ namespace Trs.PegParser.Tests
             semanticActions.SetTerminalAction(TokenNames.A, (matchedTokens, _) => matchedTokens.GetMatchedString());
             semanticActions.SetNonTerminalAction(ParsingRuleNames.NonTerminalA, (matchedTokens, subResults) =>
             {
-                this.tokens = matchedTokens;
                 _subResults = subResults.ToList();
                 return subResults.First();
             });
