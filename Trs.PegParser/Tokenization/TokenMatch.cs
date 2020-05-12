@@ -23,5 +23,8 @@ namespace Trs.PegParser.Tokenization
                 0 => string.Empty,
                 _ => InputString.Substring(MatchedCharacterRange.StartIndex, MatchedCharacterRange.Length)
             };
+
+        public override string ToString()
+            => $"{TokenName} - {GetMatchedString()}";
     }
 }

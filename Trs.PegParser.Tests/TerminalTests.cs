@@ -35,7 +35,7 @@ namespace Trs.PegParser.Tests
 
             // Act
             var tokensResult = tokenizer.Tokenize(inputString);            
-            var parseResult = parser.Parse(tokensResult);
+            var parseResult = parser.Parse(tokensResult.MatchedRanges);
 
             // Assert
             Assert.Equal(new MatchRange(0, 1), parseResult.MatchedTokens.MatchedIndices);

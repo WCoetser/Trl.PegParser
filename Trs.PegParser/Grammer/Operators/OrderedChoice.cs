@@ -62,5 +62,7 @@ namespace Trs.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies
             => _choiceSubExpressions.Any(e => e.HasNonTerminalParsingRuleBodies);
+
+        public override string ToString() => string.Join(" OR ", _choiceSubExpressions.Select(s => s.ToString()));
     }
 }

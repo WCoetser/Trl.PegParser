@@ -50,5 +50,7 @@ namespace Trs.PegParser.Grammer.Operators
         /// Terminals do not contain non-terminals, therefore this is always false.
         /// </summary>
         public bool HasNonTerminalParsingRuleBodies => false;
+
+        public override string ToString() => $"\"{_expectedToken}\"";
     }
 }

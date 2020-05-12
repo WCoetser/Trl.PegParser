@@ -50,7 +50,9 @@ namespace Trs.PegParser.Grammer.Operators
                 }
                 return ParseResult<TTokenTypeName, TActionResult>.Succeeded(parseResult.NextParseStartIndex, parseResult.MatchedTokens, semanticActionResult);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Failed(parseResult.NextParseStartIndex);
+            return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
         }
+
+        public override string ToString() => $"NonTerminal({_noneTerminalName})";
     }
 }

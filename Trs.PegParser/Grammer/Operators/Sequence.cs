@@ -76,5 +76,7 @@ namespace Trs.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies
             => _sequenceDefinition.Any(seqElement => seqElement.HasNonTerminalParsingRuleBodies);
+
+        public override string ToString() => string.Join(" ", _sequenceDefinition.Select(s => s.ToString()));
     }
 }

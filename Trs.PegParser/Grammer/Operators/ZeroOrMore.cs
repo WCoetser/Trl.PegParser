@@ -23,17 +23,16 @@ namespace Trs.PegParser.Grammer.Operators
         {
             ParseResult<TTokenTypeName, TActionResult> lastResult;
             int nextParseIndex = startIndex;
-            int previousNextParseIndex = -1;
             int totalMatchLength = 0;
             // TODO: Move this to a "yield return" method to stream parse results instead of storing them in memory
             List<TActionResult> subResults = new List<TActionResult>();
             do
             {
+                int previousNextParseIndex = nextParseIndex;
                 lastResult = _subExpression.Parse(inputTokens, nextParseIndex, mustConsumeTokens);
                 if (lastResult.Succeed)
                 {
                     totalMatchLength += lastResult.MatchedTokens.MatchedIndices.Length;
-                    previousNextParseIndex = nextParseIndex;
                     nextParseIndex = lastResult.NextParseStartIndex;
                     subResults.Add(lastResult.SemanticActionResult);
                 }
@@ -43,7 +42,7 @@ namespace Trs.PegParser.Grammer.Operators
                     break;
                 }
             }
-            while (lastResult.Succeed);
+            while (lastResult.Succeed && nextParseIndex < inputTokens.Count);
             // This will always succeed, because it also accepts the empty case
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, totalMatchLength));
             TActionResult semanticResult = default;
@@ -59,5 +58,7 @@ namespace Trs.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies
             => _subExpression.HasNonTerminalParsingRuleBodies;
+
+        public override string ToString() => $"ZeroOrMore({_subExpression})";
     }
 }

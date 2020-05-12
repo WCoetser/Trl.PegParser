@@ -8,3 +8,5 @@ Trs.PegParser.Tests/obj/
 nupkg/
 Trs.PegParser.Tests/TestResults/
 UnitTestCoverageReport/
+Trs.PegParser.SampleApp/bin/
+Trs.PegParser.SampleApp/obj/
