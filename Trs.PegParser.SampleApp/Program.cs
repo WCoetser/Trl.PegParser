@@ -24,12 +24,13 @@ namespace Trs.PegParser.SampleApp
         // line 1: The function to be graphed
         // line 2: The function domain (i.e. input value range)
 
-        const string TestInput = "1 + 1;";
-//@"
-//        ((sin(x) + cos(x)) * 3 - x) / 2;
-//        domain(0, 2); 
-//        ";
-        
+        //const string TestInput = @"
+        //((sin(x) + cos(x)) * 3 - x) / 2;
+        //domain(0, 2); 
+        //";
+
+        const string TestInput = @"1;";
+
 
         // Output width in px - the height will be calculated from the "output" values,
         // preserving the aspect ratio.
@@ -65,7 +66,7 @@ namespace Trs.PegParser.SampleApp
             var parseResult = parser.Parse(inputTokens);
             if (!parseResult.Succeed)
             {
-                Console.WriteLine("Error - Parsing failed");
+                Console.WriteLine("Parsing failed");
                 return;
             }
 

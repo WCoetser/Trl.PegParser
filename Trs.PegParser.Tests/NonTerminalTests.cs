@@ -54,16 +54,38 @@ namespace Trs.PegParser.Tests
             var testNonTerminal = op.NonTerminal(ParsingRuleNames.NonTerminalA);
 
             // Act
-            bool before = ((IParsingOperatorExecution<TokenNames, ParsingRuleNames, string>)testNonTerminal).HasNonTerminalParsingRuleBodies;
+            bool before = testNonTerminal.HasNonTerminalParsingRuleBodies;
             peg.Parser(ParsingRuleNames.Start, new[] {
                 peg.Rule(ParsingRuleNames.Start, testNonTerminal),
                 peg.Rule(ParsingRuleNames.NonTerminalA, op.Terminal(TokenNames.A))
             });
-            bool after = ((IParsingOperatorExecution<TokenNames, ParsingRuleNames, string>)testNonTerminal).HasNonTerminalParsingRuleBodies;
+            bool after = testNonTerminal.HasNonTerminalParsingRuleBodies;
 
             // Assert
             Assert.False(before);
             Assert.True(after);
+        }
+
+        [Fact]
+        public void ShouldAvoidNonTerminationOnLeftRecursion()
+        {
+            // Arrange
+            string inputString = string.Empty;
+            var op = peg.Operators;
+            var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
+            // Create a parser with a cycle due to recursive nonterminal definitions
+            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
+                peg.Rule(ParsingRuleNames.Start, op.NonTerminal(ParsingRuleNames.NonTerminalA)),
+                peg.Rule(ParsingRuleNames.NonTerminalA, op.NonTerminal(ParsingRuleNames.NonTerminalB)),
+                peg.Rule(ParsingRuleNames.NonTerminalB, op.NonTerminal(ParsingRuleNames.Start))
+            });
+
+            // Act
+            var inputTokens = tokenizer.Tokenize(inputString);
+            var parseResult = parser.Parse(inputTokens.MatchedRanges);
+
+            // Assert
+            Assert.False(parseResult.Succeed); // if it got this far it terminated.
         }
     }
 }

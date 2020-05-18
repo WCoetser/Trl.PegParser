@@ -58,14 +58,16 @@ namespace Trs.PegParser.SampleApp
                 pegFacade.Rule(ParsingRuleNames.Function,
                     op.OrderedChoice(
                         // Order is important here 
-                        op.NonTerminal(ParsingRuleNames.Number),                        
-                        op.NonTerminal(ParsingRuleNames.Variable_X),
-                        op.NonTerminal(ParsingRuleNames.Sin),
-                        op.NonTerminal(ParsingRuleNames.Cos),
                         op.NonTerminal(ParsingRuleNames.Multiply),
                         op.NonTerminal(ParsingRuleNames.Divide),
                         op.NonTerminal(ParsingRuleNames.Add),
                         op.NonTerminal(ParsingRuleNames.Subtract),
+                        // If these are specified first, parsing will stop after (for example) 
+                        // matching a number
+                        op.NonTerminal(ParsingRuleNames.Number),
+                        op.NonTerminal(ParsingRuleNames.Variable_X),
+                        op.NonTerminal(ParsingRuleNames.Sin),
+                        op.NonTerminal(ParsingRuleNames.Cos),                        
                         op.NonTerminal(ParsingRuleNames.Brackets))),
 
                 // Brackets for grouping

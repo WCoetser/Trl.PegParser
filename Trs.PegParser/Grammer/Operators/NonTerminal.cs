@@ -19,8 +19,13 @@ namespace Trs.PegParser.Grammer.Operators
         private IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _ruleBody;
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
 
+        /// <summary>
+        /// Use this collection to prevent non-termination due to left recursion.
+        /// </summary>
+        private readonly HashSet<int> _previousStartIndices;
+
         public NonTerminal(TNoneTerminalName noneTerminalName, SemanticAction<TActionResult, TTokenTypeName> matchAction)
-            => (_noneTerminalName, _matchAction) = (noneTerminalName, matchAction);
+            => (_noneTerminalName, _matchAction, _previousStartIndices) = (noneTerminalName, matchAction, new HashSet<int>());
 
         public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
             => new[] { _noneTerminalName };
@@ -40,17 +45,35 @@ namespace Trs.PegParser.Grammer.Operators
 
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
+            // Prevent this non-terminal from calling itself on the same start index
+            bool hasLeftRecursion = _previousStartIndices.Contains(startIndex);
+            if (hasLeftRecursion)
+            {
+                return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
+            }
+            _previousStartIndices.Add(startIndex);
+
+            // Actual parsing starts here
             var parseResult = _ruleBody.Parse(inputTokens, startIndex, mustConsumeTokens);
             TActionResult semanticActionResult = default;
-            if (parseResult.Succeed)
+            ParseResult<TTokenTypeName, TActionResult> returnResult = null;
+            if (!parseResult.Succeed)
+            {
+                returnResult = ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
+            }
+            else
             {
                 if (_matchAction != null && mustConsumeTokens)
                 {
                     semanticActionResult = _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });
                 }
-                return ParseResult<TTokenTypeName, TActionResult>.Succeeded(parseResult.NextParseStartIndex, parseResult.MatchedTokens, semanticActionResult);
+                returnResult = ParseResult<TTokenTypeName, TActionResult>.Succeeded(parseResult.NextParseStartIndex, parseResult.MatchedTokens, semanticActionResult);
             }
-            return ParseResult<TTokenTypeName, TActionResult>.Failed(startIndex);
+
+            // Remove start index to preserve memory ... it should not be needed beyond this point
+            _previousStartIndices.Remove(startIndex);
+
+            return returnResult;
         }
 
         public override string ToString() => $"NonTerminal({_noneTerminalName})";

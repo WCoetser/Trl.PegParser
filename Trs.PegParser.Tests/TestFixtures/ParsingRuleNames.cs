@@ -7,6 +7,7 @@
         ConcatenationTest,
         Head,
         Tail,
-        NonTerminalA
+        NonTerminalA,
+        NonTerminalB
     }
 }
