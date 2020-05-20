@@ -11,17 +11,14 @@ namespace Trs.PegParser.SampleApp
         Brackets,
         Sin,
         Cos,
-        Add,
-        Subtract,
-        Multiply,
-        Divide,
+        BinaryExpression,
         Variable_X,
         Number
     }
     
     public static class ParsingRuleDefinitions
     {       
-        public static Parser<TokensNames, ParsingRuleNames, IParseResult> GetParser(PegFacade<TokensNames, ParsingRuleNames, IParseResult> pegFacade)
+        public static Parser<TokensNames, ParsingRuleNames, ICalculatorAstNode> GetParser(PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode> pegFacade)
         {
             // Operators are seperated into a seperate "mini facade" to avoid too many 
             // method definitions in one class
@@ -58,10 +55,7 @@ namespace Trs.PegParser.SampleApp
                 pegFacade.Rule(ParsingRuleNames.Function,
                     op.OrderedChoice(
                         // Order is important here 
-                        op.NonTerminal(ParsingRuleNames.Multiply),
-                        op.NonTerminal(ParsingRuleNames.Divide),
-                        op.NonTerminal(ParsingRuleNames.Add),
-                        op.NonTerminal(ParsingRuleNames.Subtract),
+                        op.NonTerminal(ParsingRuleNames.BinaryExpression),
                         // If these are specified first, parsing will stop after (for example) 
                         // matching a number
                         op.NonTerminal(ParsingRuleNames.Number),
@@ -90,28 +84,13 @@ namespace Trs.PegParser.SampleApp
                                 op.NonTerminal(ParsingRuleNames.Function),
                                 op.Terminal(TokensNames.CloseRoundBracket))),
 
-                // Multiply
-                pegFacade.Rule(ParsingRuleNames.Multiply,
+                // Binary expression
+                pegFacade.Rule(ParsingRuleNames.BinaryExpression,
                     op.Sequence(op.NonTerminal(ParsingRuleNames.Function),
-                                op.Terminal(TokensNames.Multiply),
-                                op.NonTerminal(ParsingRuleNames.Function))),
-
-                // Divide
-                pegFacade.Rule(ParsingRuleNames.Divide,
-                    op.Sequence(op.NonTerminal(ParsingRuleNames.Function),
-                                op.Terminal(TokensNames.Divide),
-                                op.NonTerminal(ParsingRuleNames.Function))),
-
-                // Add
-                pegFacade.Rule(ParsingRuleNames.Add,
-                    op.Sequence(op.NonTerminal(ParsingRuleNames.Function),
-                                op.Terminal(TokensNames.Plus),
-                                op.NonTerminal(ParsingRuleNames.Function))),
-
-                // Subtract
-                pegFacade.Rule(ParsingRuleNames.Subtract,
-                    op.Sequence(op.NonTerminal(ParsingRuleNames.Function),
-                                op.Terminal(TokensNames.Minus),
+                                op.OrderedChoice(op.Terminal(TokensNames.Multiply), 
+                                                 op.Terminal(TokensNames.Divide), 
+                                                 op.Terminal(TokensNames.Plus), 
+                                                 op.Terminal(TokensNames.Minus)),
                                 op.NonTerminal(ParsingRuleNames.Function))),
 
                 // Subtract

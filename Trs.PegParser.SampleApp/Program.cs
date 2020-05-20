@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Trs.PegParser.Grammer;
 
 namespace Trs.PegParser.SampleApp
 {
@@ -24,13 +25,10 @@ namespace Trs.PegParser.SampleApp
         // line 1: The function to be graphed
         // line 2: The function domain (i.e. input value range)
 
-        //const string TestInput = @"
-        //((sin(x) + cos(x)) * 3 - x) / 2;
-        //domain(0, 2); 
-        //";
-
-        const string TestInput = @"1;";
-
+        const string TestInput = @"
+        ((sin(x) + cos(x)) * 3 - x) / 2;
+        domain(0, 2); 
+        ";
 
         // Output width in px - the height will be calculated from the "output" values,
         // preserving the aspect ratio.
@@ -41,7 +39,7 @@ namespace Trs.PegParser.SampleApp
         {
             // All functionality should be accessed via the PegFacade class.
             // This ties the Tokenizer, Parser, and semantic functions together.
-            var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, IParseResult>();
+            var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>();
             
             // First define the tokens and create the tokenizer
             var tokenizer = pegFacade.Tokenizer(TokenDefinitions.GetTokenDefinitions());
@@ -62,15 +60,19 @@ namespace Trs.PegParser.SampleApp
                                 .Where(m => m.TokenName != TokensNames.Whitespace)
                                 .ToList();
 
+            Console.WriteLine($"input: {TestInput}");
+            Console.WriteLine($"number characters: {TestInput.Length}");
+
             // Parse
             var parseResult = parser.Parse(inputTokens);
             if (!parseResult.Succeed)
             {
                 Console.WriteLine("Parsing failed");
-                return;
             }
-
-            Console.WriteLine("Parsing succeeded");
+            else
+            {
+                Console.WriteLine("Parsing succeeded");
+            }
         }
     }
 }

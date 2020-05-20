@@ -5,9 +5,6 @@ namespace Trs.PegParser.Grammer
     public class ParseResult<TTokenTypeName, TActionResult>
         where TTokenTypeName: Enum
     {
-
-        public static int stepsCount = 0;
-
         /// <summary>
         /// Specifies whether parsing succeeded.
         /// </summary>
@@ -29,10 +26,7 @@ namespace Trs.PegParser.Grammer
         public TActionResult SemanticActionResult { get; }
 
         private ParseResult(bool succeed, int nextParseStartIndex, TokensMatch<TTokenTypeName> matchedTokens = null, TActionResult semanticActionResult = default)
-        {
-            (NextParseStartIndex, Succeed, MatchedTokens, SemanticActionResult) = (nextParseStartIndex, succeed, matchedTokens, semanticActionResult);
-            stepsCount++;
-        }
+        => (NextParseStartIndex, Succeed, MatchedTokens, SemanticActionResult) = (nextParseStartIndex, succeed, matchedTokens, semanticActionResult);
 
         public static ParseResult<TTokenTypeName, TActionResult>
             Succeeded(int nextParseStartIndex, TokensMatch<TTokenTypeName> matchedTokens, TActionResult semanticActionResult)
