@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Trs.PegParser.Grammer;
 using Trs.PegParser.Grammer.Operators;
+using Trs.PegParser.Grammer.Semantics;
 
 namespace Trs.PegParser
 {
@@ -9,9 +10,9 @@ namespace Trs.PegParser
         where TTokenTypeName : Enum
         where TNonTerminalName : Enum
     {
-        private readonly SemanticActions<TTokenTypeName, TNonTerminalName, TActionResult> _defaultSemanticActions;
+        private readonly SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult> _defaultSemanticActions;
 
-        internal OperatorFacade(SemanticActions<TTokenTypeName, TNonTerminalName, TActionResult> defaultSemanticActions)
+        internal OperatorFacade(SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult> defaultSemanticActions)
         {
             _defaultSemanticActions = defaultSemanticActions;
         }

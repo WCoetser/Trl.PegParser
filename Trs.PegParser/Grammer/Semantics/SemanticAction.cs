@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Trs.PegParser.Grammer
+namespace Trs.PegParser.Grammer.Semantics
 {
     /// <summary>
     /// This is the definition of a function type for functions that are called from PEG operators to pass parsing 

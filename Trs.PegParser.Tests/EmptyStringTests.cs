@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Trs.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -42,6 +43,30 @@ namespace Trs.PegParser.Tests
             Assert.True(parseResult.Succeed);
             Assert.Equal(inputString, parseResult.SemanticActionResult);
             Assert.Equal(0, parseResult.NextParseStartIndex);
+        }
+
+        [Fact]
+        public void ShouldSupportGenericPassthroughResult()
+        {
+            // Arrange
+            var peg = Peg.GenericPassthroughTest();
+            peg.DefaultSemanticActions.SetDefaultGenericPassthroughAction<GenericPassthroughAst>();
+            string inputString = string.Empty;
+            var op = peg.Operators;
+            var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
+            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
+                peg.Rule(ParsingRuleNames.Start, op.EmptyString()),
+            });
+
+            // Act
+            var tokensResult = tokenizer.Tokenize(inputString);
+            var parseResult = parser.Parse(tokensResult.MatchedRanges);
+
+            // Assert
+            var result = (GenericPassthroughAst)parseResult.SemanticActionResult;
+            var subResults = result.SubResults.Cast<GenericPassthroughAst>().ToList();
+            Assert.Equal(string.Empty, result.MatchedTokens.GetMatchedString());
+            Assert.Empty(subResults);
         }
     }
 }

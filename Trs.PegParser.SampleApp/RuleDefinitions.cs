@@ -1,4 +1,7 @@
-﻿using Trs.PegParser.Grammer;
+﻿using System.Linq;
+using Trs.PegParser.Grammer;
+using Trs.PegParser.SampleApp.AST;
+using Trs.PegParser.SampleApp.AST.Trs.PegParser.SampleApp.AST;
 
 namespace Trs.PegParser.SampleApp
 {
@@ -28,6 +31,45 @@ namespace Trs.PegParser.SampleApp
             // or could be default actions defined per input token type, operator, or parsing rule name.
             // The idea with default actions is to clean up the parsing rule definitions as much as possible.
             // It is possible to first define and test the parser, and then add the semantics later.
+            var defaultSemantics = pegFacade.DefaultSemanticActions;
+
+            // Set generic passthrough type to avoid coding boilerplate
+            defaultSemantics.SetDefaultGenericPassthroughAction<GenericResult>();
+
+            // Function
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.Function, (_, subResult) => subResult.First());
+
+            // Number
+            defaultSemantics.SetTerminalAction(TokensNames.Number, (matchResult, _) => new Number(matchResult.GetMatchedString()));
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.Number, (_, subResult) => subResult.First());
+            
+            // Variable
+            defaultSemantics.SetTerminalAction(TokensNames.X, (matchResult, _) => new Variable());
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.Number, (_, subResult) => subResult.First());
+            
+            // Binary expression
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchResult, subActionResults) =>
+            {
+                var subResultsList = subActionResults.ToList();
+                var op = (GenericResult)subResultsList[1];
+                var lhs = (FunctionBase)subResultsList[0];
+                var rhs = (FunctionBase)subResultsList[2];
+                return new BinaryExpression(op.MatchedTokens.GetMatchedString(), lhs, rhs);
+            });
+
+            // Cosine
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.Cos, 
+                (matchResult, subActionResults) => new Cos((FunctionBase)subActionResults.Skip(2).First()));
+
+            // Sine
+            defaultSemantics.SetNonTerminalAction(ParsingRuleNames.Sin,
+                (matchResult, subActionResults) => new Sin((FunctionBase)subActionResults.Skip(2).First()));
+
+            // Brackets
+
+            // Input domain
+
+            // Statement
 
 
             // A parser is defined by the start symbol and a collection of parsing rules
@@ -93,7 +135,7 @@ namespace Trs.PegParser.SampleApp
                                                  op.Terminal(TokensNames.Minus)),
                                 op.NonTerminal(ParsingRuleNames.Function))),
 
-                // Subtract
+                // Variable
                 pegFacade.Rule(ParsingRuleNames.Variable_X, op.Terminal(TokensNames.X)),
 
                 // Number

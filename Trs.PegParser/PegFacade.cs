@@ -19,12 +19,12 @@ namespace Trs.PegParser
         where TTokenTypeName : Enum
         where TNonTerminalName : Enum
     {
-        public SemanticActions<TTokenTypeName, TNonTerminalName, TActionResult> DefaultSemanticActions { get; }
+        public SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult> DefaultSemanticActions { get; }
         public OperatorFacade<TTokenTypeName, TNonTerminalName, TActionResult> Operators { get; }
 
         public PegFacade()
         {
-            DefaultSemanticActions = new SemanticActions<TTokenTypeName, TNonTerminalName, TActionResult>();
+            DefaultSemanticActions = new SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult>();
             Operators = new OperatorFacade<TTokenTypeName, TNonTerminalName, TActionResult>(DefaultSemanticActions);
         }
 
