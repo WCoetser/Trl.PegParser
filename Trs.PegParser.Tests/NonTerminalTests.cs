@@ -29,10 +29,8 @@ namespace Trs.PegParser.Tests
             string inputString = "aaaa";
             var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.NonTerminal(ParsingRuleNames.NonTerminalA)),
-                peg.Rule(ParsingRuleNames.NonTerminalA, op.Terminal(TokenNames.A))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => NonTerminalA; NonTerminalA => [A];");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var inputTokens = tokenizer.Tokenize(inputString);
@@ -74,11 +72,8 @@ namespace Trs.PegParser.Tests
             var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
             // Create a parser with a cycle due to recursive nonterminal definitions
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.NonTerminal(ParsingRuleNames.NonTerminalA)),
-                peg.Rule(ParsingRuleNames.NonTerminalA, op.NonTerminal(ParsingRuleNames.NonTerminalB)),
-                peg.Rule(ParsingRuleNames.NonTerminalB, op.NonTerminal(ParsingRuleNames.Start))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => NonTerminalA; NonTerminalA => NonTerminalA; NonTerminalB => Start;");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var inputTokens = tokenizer.Tokenize(inputString);
