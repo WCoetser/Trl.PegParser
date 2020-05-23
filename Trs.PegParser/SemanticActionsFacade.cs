@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Trs.PegParser.Grammer.Semantics;
 
 namespace Trs.PegParser
@@ -31,7 +32,7 @@ namespace Trs.PegParser
         public void SetDefaultGenericPassthroughAction<TGenericResult>()
             where TGenericResult : GenericPassthroughResult<TActionResult, TTokenTypeName>, TActionResult, new()
         {
-            _passthroughFunction = (tokensMatch, subResults) => new TGenericResult { MatchedTokens = tokensMatch, SubResults = subResults };
+            _passthroughFunction = (tokensMatch, subResults) => new TGenericResult { MatchedTokens = tokensMatch, SubResults = subResults.ToList().AsReadOnly() };
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> SequenceAction
@@ -78,13 +79,25 @@ namespace Trs.PegParser
             => semanticAction;
 
         public void SetTerminalAction(TTokenTypeName tokenType, SemanticAction<TActionResult, TTokenTypeName> semanticAction)
-            => _actionByTerminalToken[tokenType] = semanticAction;
+        {
+            if (_actionByTerminalToken.ContainsKey(tokenType))
+            {
+                throw new Exception($"Terminal action already assigned for {tokenType}");
+            }
+            _actionByTerminalToken[tokenType] = semanticAction;
+        }
 
         public SemanticAction<TActionResult, TTokenTypeName> GetTerminalAction(TTokenTypeName tokenType)
             => _actionByTerminalToken.TryGetValue(tokenType, out SemanticAction<TActionResult, TTokenTypeName> action) ? action : _passthroughFunction;
 
         public void SetNonTerminalAction(TNonTerminalName nonTerminalA, SemanticAction<TActionResult, TTokenTypeName> matchAction)
-        => _actionByNonTerminal[nonTerminalA] = matchAction;
+        {
+            if (_actionByNonTerminal.ContainsKey(nonTerminalA))
+            {
+                throw new Exception($"Nonterminal action already assigned for {nonTerminalA}");
+            }
+            _actionByNonTerminal[nonTerminalA] = matchAction;
+        }
 
         public SemanticAction<TActionResult, TTokenTypeName> GetNonTerminalAction(TNonTerminalName nonTerminal)
         => _actionByNonTerminal.TryGetValue(nonTerminal, out SemanticAction<TActionResult, TTokenTypeName> action) ? action : _passthroughFunction;

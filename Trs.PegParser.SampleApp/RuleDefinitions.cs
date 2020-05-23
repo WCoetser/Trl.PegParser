@@ -71,6 +71,7 @@ namespace Trs.PegParser.SampleApp
 
             // Statement
 
+            // Start
 
             // A parser is defined by the start symbol and a collection of parsing rules
             return pegFacade.Parser(ParsingRuleNames.Start, new[] { 

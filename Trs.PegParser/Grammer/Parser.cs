@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trs.PegParser.Grammer.Operators;
 using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.Grammer
@@ -9,10 +10,10 @@ namespace Trs.PegParser.Grammer
         where TTokenTypeName: Enum
         where TNonTerminalName: Enum
     {
-        private readonly TNonTerminalName _startSymbol;
         private readonly Dictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> _grammerRules;
+        private readonly NonTerminal<TTokenTypeName, TNonTerminalName, TSemanticActionResult> _startSymbol;
 
-        public Parser(TNonTerminalName startSymbol, 
+        public Parser(NonTerminal<TTokenTypeName, TNonTerminalName, TSemanticActionResult> startSymbol, 
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules) {
 
             if (grammerRules == null)
@@ -20,9 +21,10 @@ namespace Trs.PegParser.Grammer
                 throw new ArgumentNullException(nameof(grammerRules));
             }
 
-            ValidateGrammer(startSymbol, grammerRules);
-
             _startSymbol = startSymbol;
+
+            ValidateGrammer(_startSymbol.GetNonTerminalNames().Single(), grammerRules);
+
             _grammerRules = grammerRules.ToDictionary(rule => rule.RuleIdentifier, 
                 rule => rule.ParsingExpression);
 
@@ -35,6 +37,7 @@ namespace Trs.PegParser.Grammer
             {
                 rule.Value.SetNonTerminalParsingRuleBody(_grammerRules);
             }
+            _startSymbol.SetNonTerminalParsingRuleBody(_grammerRules);
         }
 
         private void ValidateGrammer(TNonTerminalName startSymbol, IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules)
@@ -79,13 +82,14 @@ namespace Trs.PegParser.Grammer
         {
             _ = inputTokens ?? throw new ArgumentNullException(nameof(inputTokens));
 
-            var parseResult = _grammerRules[_startSymbol].Parse(inputTokens, 0, true);
+            var parseResult = _startSymbol.Parse(inputTokens, 0, true);
 
             // Test for extra input at end of input
             if (parseResult.Succeed && parseResult.NextParseStartIndex != inputTokens.Count)
             {
                 return ParseResult<TTokenTypeName, TSemanticActionResult>.Failed(parseResult.NextParseStartIndex);
             }
+
             return parseResult;
         }
     }

@@ -28,13 +28,11 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.TerminalTest, new[] { 
-                peg.Rule(ParsingRuleNames.TerminalTest, op.Terminal(TokenNames.A)),
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("TerminalTest => [A];");
+            var parser = peg.Parser(ParsingRuleNames.TerminalTest, rules);
 
             // Act
-            var tokensResult = tokenizer.Tokenize(inputString);            
+            var tokensResult = tokenizer.Tokenize(inputString);
             var parseResult = parser.Parse(tokensResult.MatchedRanges);
 
             // Assert

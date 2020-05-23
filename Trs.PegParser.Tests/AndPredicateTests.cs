@@ -83,7 +83,7 @@ namespace Trs.PegParser.Tests
 
             // Assert
             var result = (GenericPassthroughAst)parseResult.SemanticActionResult;
-            var subResults = result.SubResults.Cast<GenericPassthroughAst>().ToList();
+            var subResults = result.SubResults.Cast<GenericPassthroughAst>().First().SubResults.Cast<GenericPassthroughAst>().ToList();
             Assert.Null(subResults[0]); // predicate does not consume tokens
             Assert.Equal("aaaa", subResults[1].MatchedTokens.GetMatchedString());
             Assert.Equal("bbbb", subResults[2].MatchedTokens.GetMatchedString());

@@ -16,6 +16,6 @@ namespace Trs.PegParser.Grammer.Semantics
         where TTokenTypeName : Enum
     {
         public TokensMatch<TTokenTypeName> MatchedTokens { get; set; }
-        public IEnumerable<TActionResult> SubResults { get; set; }
+        public IReadOnlyList<TActionResult> SubResults { get; set; }
     }
 }

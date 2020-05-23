@@ -64,7 +64,7 @@ namespace Trs.PegParser.Tests
 
             // Assert
             var result = (GenericPassthroughAst)parseResult.SemanticActionResult;
-            var subResults = result.SubResults.Cast<GenericPassthroughAst>().ToList();
+            var subResults = result.SubResults.Cast<GenericPassthroughAst>().First().SubResults.Cast<GenericPassthroughAst>().ToList();
             Assert.Equal(string.Empty, result.MatchedTokens.GetMatchedString());
             Assert.Empty(subResults);
         }

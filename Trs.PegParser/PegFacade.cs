@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Trs.PegParser.Grammer;
+using Trs.PegParser.Grammer.ParserGenerator;
 using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser
 {
     /// <summary>
-    /// Facade for creating PEG parser.
+    /// Facade for creating PEG parser, tying everything together.
     /// 
     /// NB: The purpose of this class is to avoid typing all the generic constraints repeatedly over and over.
     /// 
@@ -21,6 +24,8 @@ namespace Trs.PegParser
     {
         public SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult> DefaultSemanticActions { get; }
         public OperatorFacade<TTokenTypeName, TNonTerminalName, TActionResult> Operators { get; }
+        public Generator<TTokenTypeName, TNonTerminalName, TActionResult> ParserGenerator 
+            => new Generator<TTokenTypeName, TNonTerminalName, TActionResult>(this);
 
         public PegFacade()
         {
@@ -36,7 +41,14 @@ namespace Trs.PegParser
 
         public Parser<TTokenTypeName, TNonTerminalName, TActionResult> Parser(TNonTerminalName startSymbol,
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>> grammerRules)
-        => new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(startSymbol, grammerRules);
+        {
+            var semanticAction = DefaultSemanticActions.GetNonTerminalAction(startSymbol);
+            if (semanticAction == default)
+            {
+                semanticAction = DefaultSemanticActions.SemanticAction((_, subResults) => subResults.FirstOrDefault());
+            }
+            return new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(Operators.NonTerminal(startSymbol, semanticAction), grammerRules);
+        }
 
         public ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult> Rule(TNonTerminalName ruleHead,
             IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> ruleBody)
