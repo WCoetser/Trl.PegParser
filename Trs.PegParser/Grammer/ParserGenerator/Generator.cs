@@ -103,18 +103,26 @@ namespace Trs.PegParser.Grammer.ParserGenerator
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Operator, (_, subResults) =>
             {
-                var subResult = ((GenericAstResult)subResults.First()).SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
-
-                if (subResult != null
-                    && (subResult.Operator is Terminal<TTokenTypeName, TNonTerminalName, TActionResult>
-                        || subResult.Operator is NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>
-                        || subResult.Operator is EmptyString<TTokenTypeName, TNonTerminalName, TActionResult>))
-                {
-                    return subResult;
-                }
-
-                throw new NotImplementedException();
+                return ((GenericAstResult)subResults.First()).SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
             });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.LeftRecursionCluster, 
+                (_, subResults) =>
+                {
+                    var firstSubExpression = (GenericAstResult)subResults.First();
+                    var lhs = firstSubExpression.SubResults[0] as  OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                    var tail = firstSubExpression.SubResults[1] as GenericAstResult;
+                    var op = tail.MatchedTokens.GetMatchedTokens().First().TokenName;
+                    if (op == TokenNames.Optional)
+                    {
+                        return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                        {
+                            Operator = _outputPeg.Operators.Optional(lhs.Operator)
+                        };
+                    }
+
+                    throw new NotImplementedException();
+                });
         }
 
         private void BuildTokenizer()
@@ -252,13 +260,13 @@ namespace Trs.PegParser.Grammer.ParserGenerator
 
             // Operators
             return _inputPeg.Rule(RuleName.Operator,
-                op.OrderedChoice(op.NonTerminal(RuleName.And),
+                op.OrderedChoice(op.NonTerminal(RuleName.LeftRecursionCluster),
+                                 op.NonTerminal(RuleName.And),
                                  op.NonTerminal(RuleName.Empty),
                                  op.NonTerminal(RuleName.NonTerminal),
                                  op.NonTerminal(RuleName.Not),
                                  op.NonTerminal(RuleName.Brackets),
-                                 op.NonTerminal(RuleName.Terminal),
-                                 op.NonTerminal(RuleName.LeftRecursionCluster)));
+                                 op.NonTerminal(RuleName.Terminal)));
         }
 
         public List<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>>

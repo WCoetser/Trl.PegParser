@@ -30,12 +30,9 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string testInput = string.Empty;
-            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[]
-            {
-                peg.Rule(ParsingRuleNames.Start, op.Optional(op.Terminal(TokenNames.A)))
-            });
+            var parseRules = peg.ParserGenerator.GetParsingRules("Start => [A]?");
+            var parser = peg.Parser(ParsingRuleNames.Start, parseRules);
 
             // Act
             var tokenizationResult = tokenizer.Tokenize(testInput);
@@ -55,11 +52,8 @@ namespace Trs.PegParser.Tests
             // Arrange
             string testInput = "aaaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.JustA);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new []
-            {
-                peg.Rule(ParsingRuleNames.Start, op.Optional(op.Terminal(TokenNames.A)))
-            });
+            var parseRules = peg.ParserGenerator.GetParsingRules("Start => [A]?");
+            var parser = peg.Parser(ParsingRuleNames.Start, parseRules);
 
             // Act
             var tokenizationResult = tokenizer.Tokenize(testInput);

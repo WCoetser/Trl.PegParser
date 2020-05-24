@@ -52,6 +52,6 @@ namespace Trs.PegParser.Grammer.Operators
         /// </summary>
         public bool HasNonTerminalParsingRuleBodies => false;
 
-        public override string ToString() => $"\"{_expectedToken}\"";
+        public override string ToString() => $"[{_expectedToken}]";
     }
 }

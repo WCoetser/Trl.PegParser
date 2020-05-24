@@ -59,6 +59,6 @@ namespace Trs.PegParser.Grammer.Operators
         public bool HasNonTerminalParsingRuleBodies
             => _subExpression.HasNonTerminalParsingRuleBodies;
 
-        public override string ToString() => $"Optional({_subExpression})";
+        public override string ToString() => $"({_subExpression})?";
     }
 }

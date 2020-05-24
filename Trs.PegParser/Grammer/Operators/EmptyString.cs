@@ -50,6 +50,6 @@ namespace Trs.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies => false;
 
-        public override string ToString() => "\"\"";
+        public override string ToString() => "[]";
     }
 }

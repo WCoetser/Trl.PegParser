@@ -77,6 +77,6 @@ namespace Trs.PegParser.Grammer.Operators
             return returnResult;
         }
 
-        public override string ToString() => $"NonTerminal({_noneTerminalName})";
+        public override string ToString() => _noneTerminalName.ToString();
     }
 }
