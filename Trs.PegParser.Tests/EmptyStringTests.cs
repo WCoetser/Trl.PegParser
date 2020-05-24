@@ -27,11 +27,9 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string inputString = string.Empty;
-            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.EmptyString()),
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => []");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokensResult = tokenizer.Tokenize(inputString);
@@ -54,9 +52,8 @@ namespace Trs.PegParser.Tests
             string inputString = string.Empty;
             var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.EmptyString()),
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => []");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokensResult = tokenizer.Tokenize(inputString);

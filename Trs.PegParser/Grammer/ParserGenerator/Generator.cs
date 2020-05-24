@@ -92,13 +92,23 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                     };
                 });
 
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Empty,
+                (_, subresults) =>
+                {
+                    return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                    {
+                        Operator = _outputPeg.Operators.EmptyString()
+                    };
+                });
+
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Operator, (_, subResults) =>
             {
                 var subResult = ((GenericAstResult)subResults.First()).SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
 
                 if (subResult != null
                     && (subResult.Operator is Terminal<TTokenTypeName, TNonTerminalName, TActionResult>
-                        || subResult.Operator is NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>))
+                        || subResult.Operator is NonTerminal<TTokenTypeName, TNonTerminalName, TActionResult>
+                        || subResult.Operator is EmptyString<TTokenTypeName, TNonTerminalName, TActionResult>))
                 {
                     return subResult;
                 }
@@ -163,7 +173,7 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                 op.Sequence(op.Terminal(TokenNames.Identifier),
                             op.Terminal(TokenNames.Arrow),
                             op.NonTerminal(RuleName.Operator),
-                            op.Terminal(TokenNames.SemiColon)));
+                            op.Optional(op.Terminal(TokenNames.SemiColon))));
         }
 
         private ParsingRule<TokenNames, RuleName, IParserGeneratorResult> BuildLeftRecursionCluster()

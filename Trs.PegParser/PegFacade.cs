@@ -24,14 +24,15 @@ namespace Trs.PegParser
     {
         public SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult> DefaultSemanticActions { get; }
         public OperatorFacade<TTokenTypeName, TNonTerminalName, TActionResult> Operators { get; }
-        public Generator<TTokenTypeName, TNonTerminalName, TActionResult> ParserGenerator 
-            => new Generator<TTokenTypeName, TNonTerminalName, TActionResult>(this);
-
+                       
         public PegFacade()
         {
             DefaultSemanticActions = new SemanticActionsFacade<TTokenTypeName, TNonTerminalName, TActionResult>();
             Operators = new OperatorFacade<TTokenTypeName, TNonTerminalName, TActionResult>(DefaultSemanticActions);
         }
+        
+        public Generator<TTokenTypeName, TNonTerminalName, TActionResult> ParserGenerator
+            => new Generator<TTokenTypeName, TNonTerminalName, TActionResult>(this);
 
         public TokenDefinition<TTokenTypeName> Token(TTokenTypeName tokenName, Regex tokenDefinition)
         => new TokenDefinition<TTokenTypeName>(tokenName, tokenDefinition);
