@@ -34,10 +34,8 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = "aaabbb";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.ConcatenationTest, new[] {
-                peg.Rule(ParsingRuleNames.ConcatenationTest, op.Sequence(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B)))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("ConcatenationTest => [A] [B]");
+            var parser = peg.Parser(ParsingRuleNames.ConcatenationTest, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(inputString);

@@ -26,10 +26,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             string input = "bbb";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B, (m, _) => m.GetMatchedString())))
-            });
+            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.B, (m, _) => m.GetMatchedString());
+            var rules = peg.ParserGenerator.GetParsingRules("Start => [A] | [B]");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(input);
@@ -48,10 +47,9 @@ namespace Trs.PegParser.Tests
             // Arrange
             string input = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.OrderedChoice(op.Terminal(TokenNames.A, (m, _) => m.GetMatchedString()), op.Terminal(TokenNames.B)))
-            });
+            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.A, (m, _) => m.GetMatchedString());
+            var rules = peg.ParserGenerator.GetParsingRules("Start => [A] | [B]");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(input);

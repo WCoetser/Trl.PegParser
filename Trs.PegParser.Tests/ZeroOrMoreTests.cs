@@ -33,10 +33,8 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = "aaabbbaaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B))))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => ([A] | [B])*");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(inputString);
@@ -59,10 +57,8 @@ namespace Trs.PegParser.Tests
             // Arrange
             var inputString = string.Empty;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.OrderedChoice(op.Terminal(TokenNames.A), op.Terminal(TokenNames.B))))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => ([A] | [B])*");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(inputString);
@@ -82,10 +78,8 @@ namespace Trs.PegParser.Tests
             // Repetition on the empty string operator could cause non-termination if not covered
             var inputString = string.Empty;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var op = peg.Operators;
-            var parser = peg.Parser(ParsingRuleNames.Start, new[] {
-                peg.Rule(ParsingRuleNames.Start, op.ZeroOrMore(op.EmptyString()))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => []*");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokens = tokenizer.Tokenize(inputString);

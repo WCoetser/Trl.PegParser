@@ -106,6 +106,11 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                 return ((GenericAstResult)subResults.First()).SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
             });
 
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Brackets, (_, subResults) =>
+            {
+                return ((GenericAstResult)(subResults.First())).SubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+            });
+
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.LeftRecursionCluster, 
                 (_, subResults) =>
                 {
@@ -120,8 +125,44 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                             Operator = _outputPeg.Operators.Optional(lhs.Operator)
                         };
                     }
-
-                    throw new NotImplementedException();
+                    else if (op == TokenNames.OneOrMore)
+                    {
+                        return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                        {
+                            Operator = _outputPeg.Operators.OneOrMore(lhs.Operator)
+                        };
+                    }
+                    else if (op == TokenNames.ZeroOrMore)
+                    {
+                        return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                        {
+                            Operator = _outputPeg.Operators.ZeroOrMore(lhs.Operator)
+                        };
+                    }
+                    else
+                    {
+                        var concatTestTail = tail.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                        if (concatTestTail != null)
+                        {
+                            return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                            {
+                                Operator = _outputPeg.Operators.Sequence(lhs.Operator, concatTestTail.Operator)
+                            };
+                        }
+                        else
+                        {
+                            var o = ((GenericAstResult)((GenericAstResult)tail.SubResults[0]).SubResults[0]);
+                            if (o.MatchedTokens.GetMatchedTokens().First().TokenName != TokenNames.Choice)
+                            {
+                                throw new Exception("Expected ordered choice symbol.");
+                            }
+                            var rhs = ((GenericAstResult)tail.SubResults[0]).SubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                            return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                            {
+                                Operator = _outputPeg.Operators.OrderedChoice(lhs.Operator, rhs.Operator)
+                            };
+                        }                        
+                    }
                 });
         }
 
@@ -131,15 +172,15 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                 _inputPeg.Token(TokenNames.Identifier, new Regex(@"[a-zA-Z_][a-zA-Z0-9_]*")),
                 _inputPeg.Token(TokenNames.OpenSquare, new Regex(@"\[")),
                 _inputPeg.Token(TokenNames.CloseSquare, new Regex(@"\]")),
-                _inputPeg.Token(TokenNames.OpenRound, new Regex(@"\[")),
-                _inputPeg.Token(TokenNames.CloseRound, new Regex(@"\]")),
+                _inputPeg.Token(TokenNames.OpenRound, new Regex(@"\(")),
+                _inputPeg.Token(TokenNames.CloseRound, new Regex(@"\)")),
                 _inputPeg.Token(TokenNames.WhiteSpace, new Regex(@"\s+")),
                 _inputPeg.Token(TokenNames.And, new Regex(@"\&")),
                 _inputPeg.Token(TokenNames.Not, new Regex(@"\!")),
                 _inputPeg.Token(TokenNames.OneOrMore, new Regex(@"\+")),
                 _inputPeg.Token(TokenNames.ZeroOrMore, new Regex(@"\*")),
                 _inputPeg.Token(TokenNames.Optional, new Regex(@"\?")),
-                _inputPeg.Token(TokenNames.Choice, new Regex(@"OR")),
+                _inputPeg.Token(TokenNames.Choice, new Regex(@"\|")),
                 _inputPeg.Token(TokenNames.Arrow, new Regex(@"\=\>")),
                 _inputPeg.Token(TokenNames.SemiColon, new Regex(@";"))
             });
