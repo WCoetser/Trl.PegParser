@@ -37,42 +37,45 @@ namespace Trs.PegParser.SampleApp
 
         static void Main(string[] args)
         {
-            // All functionality should be accessed via the PegFacade class.
-            // This ties the Tokenizer, Parser, and semantic functions together.
-            var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>();
+
+            throw new NotImplementedException("Under construction");
+
+            //// All functionality should be accessed via the PegFacade class.
+            //// This ties the Tokenizer, Parser, and semantic functions together.
+            //var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>();
             
-            // First define the tokens and create the tokenizer
-            var tokenizer = pegFacade.Tokenizer(TokenDefinitions.GetTokenDefinitions());
+            //// First define the tokens and create the tokenizer
+            //var tokenizer = pegFacade.Tokenizer(TokenDefinitions.GetTokenDefinitions());
 
-            // Create the parser
-            var parser = ParsingRuleDefinitions.GetParser(pegFacade);
+            //// Create the parser
+            //var parser = ParsingRuleDefinitions.GetParser(pegFacade);
 
-            // Tokenize
-            var tokens = tokenizer.Tokenize(TestInput);
-            if (!tokens.Succeed)
-            {
-                Console.WriteLine("Error - Unknown characters");
-                return;
-            }
+            //// Tokenize
+            //var tokens = tokenizer.Tokenize(TestInput);
+            //if (!tokens.Succeed)
+            //{
+            //    Console.WriteLine("Error - Unknown characters");
+            //    return;
+            //}
 
-            // Strip whitespace
-            var inputTokens = tokens.MatchedRanges
-                                .Where(m => m.TokenName != TokensNames.Whitespace)
-                                .ToList();
+            //// Strip whitespace
+            //var inputTokens = tokens.MatchedRanges
+            //                    .Where(m => m.TokenName != TokensNames.Whitespace)
+            //                    .ToList();
 
-            Console.WriteLine($"input: {TestInput}");
-            Console.WriteLine($"number characters: {TestInput.Length}");
+            //Console.WriteLine($"input: {TestInput}");
+            //Console.WriteLine($"number characters: {TestInput.Length}");
 
-            // Parse
-            var parseResult = parser.Parse(inputTokens);
-            if (!parseResult.Succeed)
-            {
-                Console.WriteLine("Parsing failed");
-            }
-            else
-            {
-                Console.WriteLine("Parsing succeeded");
-            }
+            //// Parse
+            //var parseResult = parser.Parse(inputTokens);
+            //if (!parseResult.Succeed)
+            //{
+            //    Console.WriteLine("Parsing failed");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Parsing succeeded");
+            //}
         }
     }
 }
