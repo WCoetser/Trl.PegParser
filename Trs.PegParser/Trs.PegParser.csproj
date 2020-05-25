@@ -6,7 +6,7 @@
     <!-- BEGIN NUGET METADATA -->
 
     <PackageId>Trs.PegParser</PackageId>
-    <Version>0.2.0</Version>
+    <Version>1.0.0</Version>
     <Authors>Wikus Coetser</Authors>
     <Company></Company>
     <Title>Tokenizer And PEG Parser</Title>
@@ -22,7 +22,7 @@
     <RepositoryBranch>master</RepositoryBranch>
     <!-- TODO: <MinClientVersion></MinClientVersion>-->
     <tags>Tokenizer PEG Grammer Regular_Expressions Regex</tags>
-    <PackageTags>Tokenizer PEG Grammer Regular_Expressions Regex</PackageTags>
+    <PackageTags>Tokenizer PEG Grammer Regular_Expressions Regex Parser Parser_Generator</PackageTags>
     <PackageProjectUrl>https://github.com/WCoetser/Trs.PegParser</PackageProjectUrl>
     <PackageReleaseNotes>Trs.PegParser contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. Trs.PegParser is build on .NET Standard 2.1 for cross-platform compatibility.</PackageReleaseNotes>
   

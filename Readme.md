@@ -1,7 +1,5 @@
 # Overview
 
-** NB: THIS IS PRE-RELEASE SOFTWARE **
-
 _Trs.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trs.PegParser_ is build on .NET Standard 2.1 for cross-platform compatibility.
 
 # Installation via Nuget
