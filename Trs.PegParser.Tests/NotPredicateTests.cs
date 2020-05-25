@@ -19,14 +19,9 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string testInput = "aaaabbbb";
-            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var term_A = op.Terminal(TokenNames.A);
-            var term_B = op.Terminal(TokenNames.B);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[]
-            {
-                peg.Rule(ParsingRuleNames.Start, op.Sequence(op.NotPredicate(term_B), term_A, term_B))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => !([B]) [A] [B]");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokenizationResult = tokenizer.Tokenize(testInput);
@@ -42,14 +37,9 @@ namespace Trs.PegParser.Tests
         {
             // Arrange
             string testInput = "aaaabbbb";
-            var op = peg.Operators;
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var term_A = op.Terminal(TokenNames.A);
-            var term_B = op.Terminal(TokenNames.B);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[]
-            {
-                peg.Rule(ParsingRuleNames.Start, op.Sequence(op.NotPredicate(term_A), term_A, term_B))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => !([A]) [A] [B]");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokenizationResult = tokenizer.Tokenize(testInput);
@@ -65,15 +55,10 @@ namespace Trs.PegParser.Tests
             // Arrange
             var peg = Peg.GenericPassthroughTest();
             peg.DefaultSemanticActions.SetDefaultGenericPassthroughAction<GenericPassthroughAst>();
-            string testInput = "aaaabbbb";
-            var op = peg.Operators;
+            string testInput = "aaaabbbb";            
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            var term_A = op.Terminal(TokenNames.A);
-            var term_B = op.Terminal(TokenNames.B);
-            var parser = peg.Parser(ParsingRuleNames.Start, new[]
-            {
-                peg.Rule(ParsingRuleNames.Start, op.Sequence(op.NotPredicate(term_B), term_A, term_B))
-            });
+            var rules = peg.ParserGenerator.GetParsingRules("Start => !([B]) [A] [B]");
+            var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
             // Act
             var tokenizationResult = tokenizer.Tokenize(testInput);
@@ -83,8 +68,9 @@ namespace Trs.PegParser.Tests
             var result = (GenericPassthroughAst)parseResult.SemanticActionResult;
             var subResults = result.SubResults.Cast<GenericPassthroughAst>().First().SubResults.Cast<GenericPassthroughAst>().ToList();
             Assert.Null(subResults[0]); // predicate does not consume tokens
-            Assert.Equal("aaaa", subResults[1].MatchedTokens.GetMatchedString());
-            Assert.Equal("bbbb", subResults[2].MatchedTokens.GetMatchedString());
+            var seqResults = subResults[1].SubResults.Cast<GenericPassthroughAst>().ToList();
+            Assert.Equal("aaaa", seqResults[0].MatchedTokens.GetMatchedString());
+            Assert.Equal("bbbb", seqResults[1].MatchedTokens.GetMatchedString());
         }
     }
 }

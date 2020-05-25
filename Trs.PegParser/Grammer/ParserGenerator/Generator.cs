@@ -111,6 +111,24 @@ namespace Trs.PegParser.Grammer.ParserGenerator
                 return ((GenericAstResult)(subResults.First())).SubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
             });
 
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.And, (_, subResults) =>
+            {
+                var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.AndPredicate(op.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Not, (_, subResults) =>
+            {
+                var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.NotPredicate(op.Operator)
+                };
+            });
+
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.LeftRecursionCluster, 
                 (_, subResults) =>
                 {
@@ -267,8 +285,9 @@ namespace Trs.PegParser.Grammer.ParserGenerator
             // Not Predicate
             return _inputPeg.Rule(RuleName.Not,
                 op.Sequence(op.Terminal(TokenNames.Not),
-                            op.NonTerminal(RuleName.NonTerminal),
-                            op.NonTerminal(RuleName.NonTerminal)));
+                            op.Terminal(TokenNames.OpenRound),
+                            op.NonTerminal(RuleName.Operator),
+                            op.Terminal(TokenNames.CloseRound)));
         }
 
         private ParsingRule<TokenNames, RuleName, IParserGeneratorResult> BuildNonTerminal()
@@ -291,8 +310,9 @@ namespace Trs.PegParser.Grammer.ParserGenerator
             // And Predicate
             return _inputPeg.Rule(RuleName.And,
                 op.Sequence(op.Terminal(TokenNames.And),
-                            op.NonTerminal(RuleName.NonTerminal),
-                            op.NonTerminal(RuleName.NonTerminal)));
+                            op.Terminal(TokenNames.OpenRound),
+                            op.NonTerminal(RuleName.Operator),
+                            op.Terminal(TokenNames.CloseRound)));
         }
 
         private ParsingRule<TokenNames, RuleName, IParserGeneratorResult> BuildOperator()
@@ -303,9 +323,9 @@ namespace Trs.PegParser.Grammer.ParserGenerator
             return _inputPeg.Rule(RuleName.Operator,
                 op.OrderedChoice(op.NonTerminal(RuleName.LeftRecursionCluster),
                                  op.NonTerminal(RuleName.And),
+                                 op.NonTerminal(RuleName.Not),
                                  op.NonTerminal(RuleName.Empty),
                                  op.NonTerminal(RuleName.NonTerminal),
-                                 op.NonTerminal(RuleName.Not),
                                  op.NonTerminal(RuleName.Brackets),
                                  op.NonTerminal(RuleName.Terminal)));
         }
