@@ -76,7 +76,7 @@ else
 
 # PEG Operator Syntax
 
-The parser generator the following operators for specifying parsing rules:
+The parser generator uses the following operators for specifying parsing rules:
 
 - And predicate: `&(E)` - the brackets are required
 - Empty string: `[]`
