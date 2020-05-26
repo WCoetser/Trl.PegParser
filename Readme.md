@@ -74,6 +74,22 @@ else
 }
 ```
 
+# PEG Operator Syntax
+
+The parser generator the following operators for specifying parsing rules:
+
+- And predicate: `&(E)` - the brackets are required
+- Empty string: `[]`
+- Non-terminal: `E` - `E` is a member of the parsing rule names enumeration.
+- Not predicate: `!(E)` - the brackets are required.
+- One or more: `E+`
+- Optional: `E?`
+- Ordered Choice: `C1 | ... | Cn`
+- Sequence: `S1 S2 ... Sn`
+- Terminal: `[T]` - `T` is a member of the terminal names enumeration.
+- Zero or more: `E*`
+- Brackets for grouping elements, ex. `(A | B) C` vs. `A | (B C)`
+
 # Installation via Nuget
 
 See [https://www.nuget.org/packages/Trs.PegParser/](https://www.nuget.org/packages/Trs.PegParser/) for nuget package.
