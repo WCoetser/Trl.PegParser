@@ -123,6 +123,7 @@ Console.WriteLine($"Sum = {output.SemanticActionResult}");
 
 The parser generator uses the following operators for specifying parsing rules:
 
+- Parsing rules have this form: `Head => Body;` - `Head` is a non-terminal symbol form the enumeration passed into the `PegFacade` class. `Body` is any combination of PEG operators. The semicolon is optional. Multiple rules can be passed into the parser generator.
 - And Predicate: `&(E)` - the brackets are required
 - Empty String: `[]`
 - Non-Terminal: `E` - `E` is a member of the parsing rule names enumeration.
