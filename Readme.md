@@ -1,6 +1,10 @@
 # Overview
 
-_Trs.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trs.PegParser_ is build on .NET Standard 2.1 for cross-platform compatibility.
+_Trs.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trs.PegParser_ is built on .NET Standard 2.1 for cross-platform compatibility.
+
+_Trs.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
+
+An example of a simple parser for adding up numbers can be found in the `Trs.PegParser` folder of this repository.
 
 # Simple Example - Parsing only
 
@@ -17,10 +21,10 @@ public enum Tokens { Plus, Number, Whitespace }
 public enum RuleNames { Add }
 ```
 
-Then define the PEG facade. This is a class that ties everything together in a type-safe manner. The output type for the parser is `double`, however it is not used in this example. In a more complex system this could be an AST (abstract syntax tree) base type or an interface.
+Then define the PEG facade. This is a class that ties everything together in a type-safe manner. The output type for the parser is `double?`, however it is not used in this section. In a more complex system this could be an AST (abstract syntax tree) base type or an interface.
 
 ```C#
-var peg = new PegFacade<Tokens, RuleNames, double>();
+var peg = new PegFacade<Tokens, RuleNames, double?>();
 ```
 
 Next define a tokenizer using regular expressions and the token names from the `Tokens` enumeration.
@@ -74,20 +78,61 @@ else
 }
 ```
 
+# Simple Example - Adding semantics with callbacks
+
+Semantics are implemented as callback functions. These functions are attached to the `PegFacade` class (see previous section) and are copied over to parsing operators when they are created via the parser generator.
+
+Therefore, these functions _must_ be defined before the parsing operators and rules. I refer to these functions as 'semantic actions' in the code.
+
+Semantic actions are assigned per parsing operator:
+
+```C#
+var semanticActions = peg.DefaultSemanticActions;
+
+semanticActions.OrderedChoiceAction = 
+    (matchedTokens, subresults) => subresults.First();
+
+semanticActions.SequenceAction = 
+    (matchedTokens, subresults) =>
+    {
+        return subresults.Where(s => s.HasValue).Sum(s => s.Value);
+    };
+```
+
+It is also possible to define actions per terminal and non-terminal symbol name. This makes it easier to implement targeted semanic actions:
+
+```C
+semanticActions.SetTerminalAction(Tokens.Number,
+    (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));            
+
+semanticActions.SetNonTerminalAction(RuleNames.Add,
+    (matchedTokens, subresults) => subresults.First());
+```
+
+The second argument for semantic actions, `subresults`, is of type `IEnumerable`. This is to accomodate scenarios where there may be more than one sub result, for example when the _Sequence_ or _One or More_ operator matched a sequence of substring.
+
+In some situations, an operator may not have a semantic action assigned. In this scenario, the default value for the semantic action return type will be returned. In this case it is `null` for `double?`.
+
+Semantic action results can be retrieved via the parse result.
+
+```C
+Console.WriteLine($"Sum = {output.SemanticActionResult}");
+```
+
 # PEG Operator Syntax
 
 The parser generator uses the following operators for specifying parsing rules:
 
-- And predicate: `&(E)` - the brackets are required
-- Empty string: `[]`
-- Non-terminal: `E` - `E` is a member of the parsing rule names enumeration.
-- Not predicate: `!(E)` - the brackets are required.
-- One or more: `E+`
+- And Predicate: `&(E)` - the brackets are required
+- Empty String: `[]`
+- Non-Terminal: `E` - `E` is a member of the parsing rule names enumeration.
+- Not Predicate: `!(E)` - the brackets are required.
+- One or More: `E+`
 - Optional: `E?`
 - Ordered Choice: `C1 | ... | Cn`
 - Sequence: `S1 S2 ... Sn`
 - Terminal: `[T]` - `T` is a member of the terminal names enumeration.
-- Zero or more: `E*`
+- Zero or More: `E*`
 - Brackets for grouping elements, ex. `(A | B) C` vs. `A | (B C)`
 
 # Installation via Nuget
