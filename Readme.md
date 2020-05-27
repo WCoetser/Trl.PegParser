@@ -4,7 +4,7 @@ _Trs.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular ex
 
 _Trs.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
 
-An example of a simple parser for adding up numbers can be found in the `Trs.PegParser` folder of this repository.
+An example of a simple parser for adding up numbers can be found in the `Trs.PegParser.SampleApp` folder of this repository.
 
 # Simple Example - Parsing only
 
