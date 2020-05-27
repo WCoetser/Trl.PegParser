@@ -1,81 +1,89 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Trs.PegParser.Grammer;
+using Trs.PegParser.Tokenization;
 
 namespace Trs.PegParser.SampleApp
 {
+    public enum Tokens { Plus, Number, Whitespace }
+
+    public enum RuleNames { Add }
+
     class Program
     {
-        //        
-        // How this works:
-        //
-        // 1. The tokenizer is used to label input character
-        //    ranges and outputs a stream of tokens.
-        //
-        // 2. The parser is used to parse the tokens
-        //    calling callback functions. These functions are refered 
-        //    to as "Semantic actions". In this program it is used to 
-        //    populate a data structure representing the test input.
-        // 
-        // 3. The data structure is used to render a graph of the input
-        //    function.
-        //
-
-        // Test innput explanation
-        // line 1: The function to be graphed
-        // line 2: The function domain (i.e. input value range)
-
-        const string TestInput = @"
-        ((sin(x) + cos(x)) * 3 - x) / 2;
-        domain(0, 2); 
-        ";
-
-        // Output width in px - the height will be calculated from the "output" values,
-        // preserving the aspect ratio.
-        const int OutputImageWidth = 1000;
-        const string OutputFileName = "output.bmp";
-
         static void Main(string[] args)
         {
+            var peg = new PegFacade<Tokens, RuleNames, double?>();
 
-            throw new NotImplementedException("Under construction");
+            const string input = "1 + 2 + 3";
 
-            //// All functionality should be accessed via the PegFacade class.
-            //// This ties the Tokenizer, Parser, and semantic functions together.
-            //var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>();
-            
-            //// First define the tokens and create the tokenizer
-            //var tokenizer = pegFacade.Tokenizer(TokenDefinitions.GetTokenDefinitions());
+            // Define tokenizer
+            Tokenizer<Tokens> tokenizer = GetTokenizer(peg);
 
-            //// Create the parser
-            //var parser = ParsingRuleDefinitions.GetParser(pegFacade);
+            // Define semantic callback functions
+            DefineSemanticActions(peg);
 
-            //// Tokenize
-            //var tokens = tokenizer.Tokenize(TestInput);
-            //if (!tokens.Succeed)
-            //{
-            //    Console.WriteLine("Error - Unknown characters");
-            //    return;
-            //}
+            // Define PEG rules
+            Parser<Tokens, RuleNames, double?> parser = DefineParser(peg);
 
-            //// Strip whitespace
-            //var inputTokens = tokens.MatchedRanges
-            //                    .Where(m => m.TokenName != TokensNames.Whitespace)
-            //                    .ToList();
+            // Tokenize input
+            var tokenResult = tokenizer.Tokenize(input);
+            if (!tokenResult.Succeed)
+            {
+                Console.WriteLine("Invalid input");
+                return;
+            }
 
-            //Console.WriteLine($"input: {TestInput}");
-            //Console.WriteLine($"number characters: {TestInput.Length}");
+            // Remove whitespace
+            var inputNoWhitespace = tokenResult.MatchedRanges
+                .Where(t => t.TokenName != Tokens.Whitespace)
+                .ToList().AsReadOnly();
 
-            //// Parse
-            //var parseResult = parser.Parse(inputTokens);
-            //if (!parseResult.Succeed)
-            //{
-            //    Console.WriteLine("Parsing failed");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Parsing succeeded");
-            //}
+            // Parse
+            var output = parser.Parse(inputNoWhitespace);
+            if (!output.Succeed)
+            {
+                Console.WriteLine("Invalid input");
+            }
+            else
+            {
+                Console.WriteLine("Parse succeeded");
+                Console.WriteLine($"Sum = {output.SemanticActionResult}");
+            }
+        }
+
+        private static Parser<Tokens, RuleNames, double?> DefineParser(PegFacade<Tokens, RuleNames, double?> peg)
+        {
+            var grammer = @"Add => (Add [Plus] Add) | [Number]";
+            var rules = peg.ParserGenerator.GetParsingRules(grammer);
+            var parser = peg.Parser(RuleNames.Add, rules); // RuleNames.Add is the start symbol
+            return parser;
+        }
+
+        private static void DefineSemanticActions(PegFacade<Tokens, RuleNames, double?> peg)
+        {
+            var semanticActions = peg.DefaultSemanticActions;
+            semanticActions.OrderedChoiceAction = (matchedTokens, subresults) => subresults.First();
+            semanticActions.SetTerminalAction(Tokens.Number,
+                (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));            
+            semanticActions.SetNonTerminalAction(RuleNames.Add,
+                (matchedTokens, subresults) => subresults.First());
+            semanticActions.SequenceAction = (matchedTokens, subresults) =>
+            {
+                // "+" will return a sub result of null because if does not have an
+                // action associated with the Plus token via a SetTerminalAction call
+                return subresults.Where(s => s.HasValue).Sum(s => s.Value);
+            };
+        }
+
+        private static Tokenizer<Tokens> GetTokenizer(PegFacade<Tokens, RuleNames, double?> peg)
+        {
+            return peg.Tokenizer(new[] {
+                peg.Token(Tokens.Plus, new Regex(@"\+")),
+                peg.Token(Tokens.Number, new Regex(@"[-+]?[0-9]+\.?[0-9]*")),
+                peg.Token(Tokens.Whitespace, new Regex(@"\s+"))
+            });
         }
     }
 }

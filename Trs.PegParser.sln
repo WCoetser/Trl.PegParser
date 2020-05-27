@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trs.PegParser", "Trs.PegPar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trs.PegParser.Tests", "Trs.PegParser.Tests\Trs.PegParser.Tests.csproj", "{C90EDCB9-7CF4-422C-8EB3-F44E23F91A5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trs.PegParser.SampleApp", "Trs.PegParser.SampleApp\Trs.PegParser.SampleApp.csproj", "{EDB7A212-A066-4078-BADE-98ACAE932D59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trs.PegParser.SampleApp", "Trs.PegParser.SampleApp\Trs.PegParser.SampleApp.csproj", "{A350B7CC-D7BE-472F-80E8-31182B9A4B24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{C90EDCB9-7CF4-422C-8EB3-F44E23F91A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C90EDCB9-7CF4-422C-8EB3-F44E23F91A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C90EDCB9-7CF4-422C-8EB3-F44E23F91A5A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDB7A212-A066-4078-BADE-98ACAE932D59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDB7A212-A066-4078-BADE-98ACAE932D59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDB7A212-A066-4078-BADE-98ACAE932D59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDB7A212-A066-4078-BADE-98ACAE932D59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A350B7CC-D7BE-472F-80E8-31182B9A4B24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A350B7CC-D7BE-472F-80E8-31182B9A4B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A350B7CC-D7BE-472F-80E8-31182B9A4B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A350B7CC-D7BE-472F-80E8-31182B9A4B24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
