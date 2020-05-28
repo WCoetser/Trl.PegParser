@@ -136,6 +136,49 @@ The parser generator uses the following operators for specifying parsing rules:
 - Zero or More: `E*`
 - Brackets for grouping elements, ex. `(A | B) C` vs. `A | (B C)`
 
+# Complex parsing scenarios
+
+In some scenarios, you may need to parse based on larger grammers. At this point it becomes tedious to work with default parsing rules and you end up coding a lot of boilerplate code to pass results from one operator to another. 
+
+To deal with this, a method was created to automatically return sub results on a tree structure, where each node corresponds to a PEG operator.
+
+When using this method, an interface needs to be defined that acts as the return value in the PEG facade. The definition for the facade may become something along these lines:
+
+```C#
+var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>();
+```
+
+Here `ICalculatorAstNode` is the semantic result. This can now be used with the afore mentioned base type (`GenericPassthroughResult`) to create a class like this:
+
+```C#
+public class GenericResult 
+    : GenericPassthroughResult<ICalculatorAstNode, TokensNames>, ICalculatorAstNode
+{
+}
+```
+
+This can now be used to create a default semantic action method by passing it to the facade.
+
+```C#
+var defaultSemantics = pegFacade.DefaultSemanticActions;
+defaultSemantics.SetDefaultGenericPassthroughAction<GenericResult>();
+```
+
+All operators created after this method call will use the passthrough function and return subresults of type `GenericResult` unless otherwise specified.
+
+After this `SetTerminalAction` and `SetNonTerminalAction` can be used to set semantic actions for specific terminals and non-terminals. For example, when parsing a binary operator, it should be possible to write something like this:
+
+```C#
+defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchResult, subActionResults) =>
+{
+    var subResultsList = subActionResults.ToList();
+    var op = (GenericResult)subResultsList[1];
+    var lhs = (FunctionBase)subResultsList[0];
+    var rhs = (FunctionBase)subResultsList[2];
+    return new BinaryExpression(op.MatchedTokens.GetMatchedString(), lhs, rhs);
+});
+```
+
 # Installation via Nuget
 
 See [https://www.nuget.org/packages/Trs.PegParser/](https://www.nuget.org/packages/Trs.PegParser/) for nuget package.
