@@ -1,2 +1,2 @@
 
-dotnet pack ./Trs.PegParser/Trs.PegParser.csproj --output .\nupkg --configuration Release
+dotnet pack ./Trl.PegParser/Trl.PegParser.csproj --output .\nupkg --configuration Release

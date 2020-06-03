@@ -1,10 +1,10 @@
 # Overview
 
-_Trs.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trs.PegParser_ is built on .NET Standard 2.1 for cross-platform compatibility.
+_Trl.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trl.PegParser_ is built on .NET Standard 2.1 for cross-platform compatibility.
 
-_Trs.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
+_Trl.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
 
-An example of a simple parser for adding up numbers can be found in the `Trs.PegParser.SampleApp` folder of this repository.
+An example of a simple parser for adding up numbers can be found in the `Trl.PegParser.SampleApp` folder of this repository.
 
 # Simple Example - Parsing only
 
@@ -181,7 +181,7 @@ defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchR
 
 # Installation via Nuget
 
-See [https://www.nuget.org/packages/Trs.PegParser/](https://www.nuget.org/packages/Trs.PegParser/) for nuget package.
+See [https://www.nuget.org/packages/Trl.PegParser/](https://www.nuget.org/packages/Trl.PegParser/) for nuget package.
 
 # Unit Test Code Coverage
 
@@ -191,4 +191,4 @@ Unit tests can be run using the `.\test.ps1` script. This will generate a code c
 
 # Licence
 
-Trs.PegParser is released under the MIT open source licence. See LICENCE.txt in this repository for the full text.
+Trl.PegParser is released under the MIT open source licence. See LICENCE.txt in this repository for the full text.

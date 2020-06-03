@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <!-- <Nullable>Enable</Nullable> -->
+
+    <!-- BEGIN NUGET METADATA -->
+
+    <PackageId>Trl.PegParser</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Wikus Coetser</Authors>
+    <Company></Company>
+    <Title>Tokenizer And PEG Parser</Title>
+    <PackageDescription>Trl.PegParser contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. Trl.PegParser is build on .NET Standard 2.1 for cross-platform compatibility.</PackageDescription>
+    <Description>Trl.PegParser contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. Trl.PegParser is build on .NET Standard 2.1 for cross-platform compatibility.</Description>
+    <Copyright>Wikus Coetser, 2020, MIT Licence</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- TODO: - <PackageReleaseNotes></PackageReleaseNotes>-->
+    <!-- <IncludeSource>True</IncludeSource> -->
+    <IsTool>False</IsTool>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/WCoetser/Trl.PegParser</RepositoryUrl>
+    <RepositoryBranch>master</RepositoryBranch>
+    <!-- TODO: <MinClientVersion></MinClientVersion>-->
+    <tags>Tokenizer PEG Grammer Regular_Expressions Regex</tags>
+    <PackageTags>Tokenizer PEG Grammer Regular_Expressions Regex Parser Parser_Generator</PackageTags>
+    <PackageProjectUrl>https://github.com/WCoetser/Trl.PegParser</PackageProjectUrl>
+    <PackageReleaseNotes>Trl.PegParser contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. Trl.PegParser is build on .NET Standard 2.1 for cross-platform compatibility.</PackageReleaseNotes>
+  
+    <!-- END NUGET METADATA -->
+  
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>
