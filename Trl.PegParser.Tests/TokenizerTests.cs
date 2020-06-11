@@ -16,6 +16,22 @@ namespace Trl.PegParser.Tests
         }
 
         [Fact]
+        public void ShouldRespectStringPrioritization()
+        {
+            // Arrange
+            var tokenizer = new Tokenizer<TokenNames>(TokenDefinitions.PrioritizationTest);
+
+            // Act
+            var tokenizationResult = tokenizer.Tokenize("\"Testing \\\" 123\";");
+
+            // Assert
+            Assert.True(tokenizationResult.Succeed);
+            Assert.Equal(2, tokenizationResult.MatchedRanges.Count);
+            Assert.Equal(TokenNames.String, tokenizationResult.MatchedRanges[0].TokenName);
+            Assert.Equal(TokenNames.SemiColon, tokenizationResult.MatchedRanges[1].TokenName);
+        }
+
+        [Fact]
         public void ShouldMatchEmptyStringIfExpected()
         {
             // Arrange

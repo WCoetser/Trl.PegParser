@@ -14,6 +14,18 @@ namespace Trl.PegParser
         public MatchRange(int startIndex, int length)
             => (StartIndex, Length) = (startIndex, length);
 
+        public bool OverlapsWith(int startIndex, int length)
+        {
+            int thisStart = StartIndex;
+            int thisEnd = StartIndex + Length;
+            int otherStart = startIndex;
+            int otherEnd = startIndex + length;
+            return (thisStart <= otherStart && otherStart < thisEnd)
+               || (thisStart < otherEnd && otherEnd < thisEnd)
+               || (otherStart <= thisStart && thisStart < otherEnd)
+               || (otherStart < thisEnd && thisEnd < otherEnd);
+        }
+
         public override bool Equals(object obj)
             => obj is MatchRange other && Equals(other);
 

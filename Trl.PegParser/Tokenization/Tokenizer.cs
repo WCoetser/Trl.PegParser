@@ -36,7 +36,7 @@ namespace Trl.PegParser.Tokenization
             return new TokenizationResult<TTokenName>(matches.Select(m => m.Value).ToList().AsReadOnly(), mismatches.AsReadOnly());
         }
 
-        private static List<MatchRange> GetMismatches(SortedDictionary<int, TokenMatch<TTokenName>> matches, int inputStringLength)
+        private List<MatchRange> GetMismatches(SortedDictionary<int, TokenMatch<TTokenName>> matches, int inputStringLength)
         {
             if (inputStringLength == 0)
             {
@@ -72,7 +72,7 @@ namespace Trl.PegParser.Tokenization
             return mismatches;
         }
 
-        private static SortedDictionary<int, TokenMatch<TTokenName>> GetMatches(string inputString, 
+        private SortedDictionary<int, TokenMatch<TTokenName>> GetMatches(string inputString, 
             IEnumerable<TokenDefinition<TTokenName>> prioritizedTokenDefinitions)
         {
             var orderedMatches = new SortedDictionary<int, TokenMatch<TTokenName>>(); // mapping from match start index to match
@@ -82,15 +82,28 @@ namespace Trl.PegParser.Tokenization
                 foreach (Match match in regexMatches)
                 {
                     // Contains check in case a higher priority regex/token def has been matched before this one
-                    if (match.Success && !orderedMatches.ContainsKey(match.Index))
+                    if (match.Success && !Overlaps(orderedMatches, match))
                     {
-                        var tokenMatch = new TokenMatch<TTokenName>(definition.Name, 
+                        var tokenMatch = new TokenMatch<TTokenName>(definition.Name,
                             new MatchRange(match.Index, match.Length), inputString);
                         orderedMatches.Add(match.Index, tokenMatch);
                     }
                 }
             }
             return orderedMatches;
+        }
+
+
+        private bool Overlaps(SortedDictionary<int, TokenMatch<TTokenName>> existingRanges, Match testMatch)
+        {
+            foreach (var value in existingRanges.Select(pair => pair.Value))
+            {
+                if (value.MatchedCharacterRange.OverlapsWith(testMatch.Index, testMatch.Length))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

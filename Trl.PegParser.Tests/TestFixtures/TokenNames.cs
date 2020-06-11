@@ -4,6 +4,10 @@
     {
         A,
         B,
-        Empty
+        Empty,
+        String,
+        Identifier,
+        Whitespace,
+        SemiColon
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using Trl.PegParser.Tokenization;
 
@@ -22,6 +23,14 @@ namespace Trl.PegParser.Tests.TestFixtures
         public static IEnumerable<TokenDefinition<TokenNames>> JustA => new[]
         {
             Peg.Facade().Token(TokenNames.A, new Regex("a+", RegexOptions.IgnoreCase))
+        };
+
+        public static IEnumerable<TokenDefinition<TokenNames>> PrioritizationTest => new[]
+        {
+            Peg.Facade().Token(TokenNames.String, new Regex("\"([^\"]|(\\\"))*\"", RegexOptions.Compiled)), // \" is used to escape quote characters
+            Peg.Facade().Token(TokenNames.Identifier, new Regex(@"[_a-zA-Z\d]\w*(\.[_a-zA-Z\d]\w*)*", RegexOptions.Compiled)),
+            Peg.Facade().Token(TokenNames.Whitespace, new Regex(@"\s+", RegexOptions.Compiled)),
+            Peg.Facade().Token(TokenNames.SemiColon, new Regex(@";", RegexOptions.Compiled))
         };
     }
 }

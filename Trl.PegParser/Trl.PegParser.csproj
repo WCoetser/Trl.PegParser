@@ -6,7 +6,7 @@
     <!-- BEGIN NUGET METADATA -->
 
     <PackageId>Trl.PegParser</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Wikus Coetser</Authors>
     <Company></Company>
     <Title>Tokenizer And PEG Parser</Title>
@@ -25,9 +25,9 @@
     <PackageTags>Tokenizer PEG Grammer Regular_Expressions Regex Parser Parser_Generator</PackageTags>
     <PackageProjectUrl>https://github.com/WCoetser/Trl.PegParser</PackageProjectUrl>
     <PackageReleaseNotes>Trl.PegParser contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. Trl.PegParser is build on .NET Standard 2.1 for cross-platform compatibility.</PackageReleaseNotes>
-  
+
     <!-- END NUGET METADATA -->
-  
+
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
