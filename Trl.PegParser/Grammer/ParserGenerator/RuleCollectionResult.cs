@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace Trl.PegParser.Grammer.ParserGenerator
 {
-    public class RuleCollectionResult<TTokenTypeName, TNoneTerminalName, TActionResult> : IParserGeneratorResult
+    public class RuleCollectionResult<TTokenTypeName, TNonTerminalName, TActionResult> : IParserGeneratorResult
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
-        public IEnumerable<ParsingRule<TTokenTypeName, TNoneTerminalName, TActionResult>> Rules { get; set; }
+        public IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>> Rules { get; set; }
     }
 }

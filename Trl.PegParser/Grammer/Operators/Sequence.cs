@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer.Operators
 {
-    public class Sequence<TTokenTypeName, TNoneTerminalName, TActionResult>
-        : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class Sequence<TTokenTypeName, TNonTerminalName, TActionResult>
+        : IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
         /// <summary>
         /// Elements making up the sequence.
         /// </summary>
-        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> _sequenceDefinition;
+        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> _sequenceDefinition;
 
         /// <summary>
         /// Action to take when sequence is matched.
         /// </summary>
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
 
-        public Sequence(IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> sequenceDefinitions,
+        public Sequence(IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> sequenceDefinitions,
             SemanticAction<TActionResult, TTokenTypeName> matchAction) {
             if (sequenceDefinitions.Count() < 2)
             {
@@ -31,9 +32,9 @@ namespace Trl.PegParser.Grammer.Operators
             _matchAction = matchAction;
         }
 
-        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
+        public IEnumerable<TNonTerminalName> GetNonTerminalNames()
         {
-            var noneTerminalNames = new HashSet<TNoneTerminalName>();
+            var noneTerminalNames = new HashSet<TNonTerminalName>();
             foreach (var seqElement in _sequenceDefinition)
             {
                 noneTerminalNames.UnionWith(seqElement.GetNonTerminalNames());
@@ -67,7 +68,15 @@ namespace Trl.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(nextParsePosition, match, actionResult);            
         }
 
-        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer)
+        {
+            foreach (var subExpression in _sequenceDefinition)
+            {
+                subExpression.SetMemoizer(memoizer);
+            }
+        }
+
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies)
         {
             foreach (var sequenceElement in _sequenceDefinition)
             {

@@ -2,13 +2,13 @@
 
 namespace Trl.PegParser.Grammer.ParserGenerator
 {
-    public class RuleAstResult<TTokenTypeName, TNoneTerminalName, TActionResult> : IParserGeneratorResult
+    public class RuleAstResult<TTokenTypeName, TNonTerminalName, TActionResult> : IParserGeneratorResult
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
-        public TNoneTerminalName RuleName { get; set; }
+        public TNonTerminalName RuleName { get; set; }
 
-        public IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> Operator { get; set; }
+        public IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> Operator { get; set; }
     }
 
 }

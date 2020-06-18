@@ -4,6 +4,8 @@ _Trl.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular ex
 
 _Trl.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
 
+_Trl.PegParser_ prevents exponential parsing times based on parsing rules with multiple left recursion non-terminals through the use of memoization.
+
 An example of a simple parser for adding up numbers can be found in the `Trl.PegParser.SampleApp` folder of this repository.
 
 # Simple Example - Parsing only
@@ -89,10 +91,10 @@ Semantic actions are assigned per parsing operator:
 ```C#
 var semanticActions = peg.DefaultSemanticActions;
 
-semanticActions.OrderedChoiceAction = 
+semanticActions.OrderedChoiceAction =
     (matchedTokens, subresults) => subresults.First();
 
-semanticActions.SequenceAction = 
+semanticActions.SequenceAction =
     (matchedTokens, subresults) =>
     {
         return subresults.Where(s => s.HasValue).Sum(s => s.Value);
@@ -103,7 +105,7 @@ It is also possible to define actions per terminal and non-terminal symbol name.
 
 ```C
 semanticActions.SetTerminalAction(Tokens.Number,
-    (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));            
+    (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));
 
 semanticActions.SetNonTerminalAction(RuleNames.Add,
     (matchedTokens, subresults) => subresults.First());
@@ -138,7 +140,7 @@ The parser generator uses the following operators for specifying parsing rules:
 
 # Complex parsing scenarios
 
-In some scenarios, you may need to parse based on larger grammers. At this point it becomes tedious to work with default parsing rules and you end up coding a lot of boilerplate code to pass results from one operator to another. 
+In some scenarios, you may need to parse based on larger grammers. At this point it becomes tedious to work with default parsing rules and you end up coding a lot of boilerplate code to pass results from one operator to another.
 
 To deal with this, a method was created to automatically return sub results on a tree structure, where each node corresponds to a PEG operator.
 
@@ -151,7 +153,7 @@ var pegFacade = new PegFacade<TokensNames, ParsingRuleNames, ICalculatorAstNode>
 Here `ICalculatorAstNode` is the semantic result. This can now be used with the afore mentioned base type (`GenericPassthroughResult`) to create a class like this:
 
 ```C#
-public class GenericResult 
+public class GenericResult
     : GenericPassthroughResult<ICalculatorAstNode, TokensNames>, ICalculatorAstNode
 {
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Grammer.Operators;
 using Trl.PegParser.Tokenization;
 
@@ -12,6 +13,7 @@ namespace Trl.PegParser.Grammer
     {
         private readonly Dictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> _grammerRules;
         private readonly NonTerminal<TTokenTypeName, TNonTerminalName, TSemanticActionResult> _startSymbol;
+        private readonly Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TSemanticActionResult>> _memoizer;
 
         public Parser(NonTerminal<TTokenTypeName, TNonTerminalName, TSemanticActionResult> startSymbol, 
             IEnumerable<ParsingRule<TTokenTypeName, TNonTerminalName, TSemanticActionResult>> grammerRules) {
@@ -22,13 +24,26 @@ namespace Trl.PegParser.Grammer
             }
 
             _startSymbol = startSymbol;
-
+            
             ValidateGrammer(_startSymbol.GetNonTerminalNames().Single(), grammerRules);
 
             _grammerRules = grammerRules.ToDictionary(rule => rule.RuleIdentifier, 
                 rule => rule.ParsingExpression);
 
+            var equalityComparer = EqualityComparer<ValueTuple<TNonTerminalName, int, bool>>.Default;
+            _memoizer = new Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TSemanticActionResult>>(equalityComparer);
+            InitializeMemoizer();
+
             AttachRuleBodiesToNonTerminals();
+        }
+
+        private void InitializeMemoizer()
+        {
+            _startSymbol.SetMemoizer(_memoizer);
+            foreach (var rule in _grammerRules)
+            {
+                rule.Value.SetMemoizer(_memoizer);
+            }
         }
 
         private void AttachRuleBodiesToNonTerminals()
@@ -81,6 +96,8 @@ namespace Trl.PegParser.Grammer
         public ParseResult<TTokenTypeName, TSemanticActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens)
         {
             _ = inputTokens ?? throw new ArgumentNullException(nameof(inputTokens));
+
+            _memoizer.ClearAll();
 
             var parseResult = _startSymbol.Parse(inputTokens, 0, true);
 

@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer.Operators
 {
-    public class Optional<TTokenTypeName, TNoneTerminalName, TActionResult>
-        : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class Optional<TTokenTypeName, TNonTerminalName, TActionResult>
+        : IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
-        private readonly IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> _subExpression;
+        private readonly IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> _subExpression;
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
 
-        public Optional(IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult> subExpression,
+        public Optional(IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> subExpression,
             SemanticAction<TActionResult, TTokenTypeName> matchAction)
         => (_subExpression, _matchAction) = (subExpression, matchAction);
 
 
-        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
+        public IEnumerable<TNonTerminalName> GetNonTerminalNames()
         => _subExpression.GetNonTerminalNames();
         
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
@@ -50,8 +51,13 @@ namespace Trl.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, matchedTokens, semanticResult);
         }
 
-        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, 
-                IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer)
+        {
+            _subExpression.SetMemoizer(memoizer);
+        }
+
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNonTerminalName, 
+                IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies)
         {
             _subExpression.SetNonTerminalParsingRuleBody(ruleBodies);
         }

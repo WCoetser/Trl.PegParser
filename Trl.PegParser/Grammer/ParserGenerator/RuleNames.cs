@@ -18,6 +18,11 @@
         //ZeroOrMore,
         //Choice,
         //Sequence
-        LeftRecursionCluster
+        LeftRecursionCluster,
+        Sequence,
+        Optional,
+        Choice,
+        ZeroOrMore,
+        OneOrMore
     }
 }

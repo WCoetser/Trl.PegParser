@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer.Operators
 {
-    public class OrderedChoice<TTokenTypeName, TNoneTerminalName, TActionResult>
-        : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class OrderedChoice<TTokenTypeName, TNonTerminalName, TActionResult>
+        : IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
-        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> _choiceSubExpressions;
+        private readonly IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> _choiceSubExpressions;
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
 
-        public OrderedChoice(IEnumerable<IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> choiceSubExpressions,
+        public OrderedChoice(IEnumerable<IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> choiceSubExpressions,
             SemanticAction<TActionResult, TTokenTypeName> matchAction)
         {
             if (choiceSubExpressions.Count() < 2)
@@ -26,7 +27,7 @@ namespace Trl.PegParser.Grammer.Operators
             _matchAction = matchAction;
         }
 
-        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
+        public IEnumerable<TNonTerminalName> GetNonTerminalNames()
         => _choiceSubExpressions.SelectMany(cse => cse.GetNonTerminalNames());
 
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
@@ -53,7 +54,15 @@ namespace Trl.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, actionResult);
         }
 
-        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer)
+        {
+            foreach (var subExpression in _choiceSubExpressions)
+            {
+                subExpression.SetMemoizer(memoizer);
+            }
+        }
+
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies)
         {
             foreach (var subExpression in _choiceSubExpressions)
             {

@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer.Operators
 {
-    public class Terminal<TTokenTypeName, TNoneTerminalName, TActionResult>
-        : IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public class Terminal<TTokenTypeName, TNonTerminalName, TActionResult>
+        : IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
         private readonly TTokenTypeName _expectedToken;
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
@@ -17,8 +18,8 @@ namespace Trl.PegParser.Grammer.Operators
         public Terminal(TTokenTypeName expectedToken, SemanticAction<TActionResult, TTokenTypeName> matchAction)
             => (_expectedToken, _matchAction) = (expectedToken, matchAction);
 
-        public IEnumerable<TNoneTerminalName> GetNonTerminalNames()
-            => Enumerable.Empty<TNoneTerminalName>();
+        public IEnumerable<TNonTerminalName> GetNonTerminalNames()
+            => Enumerable.Empty<TNonTerminalName>();
         
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens,
             int startIndex, bool mustConsumeTokens)
@@ -42,7 +43,11 @@ namespace Trl.PegParser.Grammer.Operators
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex + 1, match, actionResult);
         }
 
-        public void SetNonTerminalParsingRuleBody(IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies)
+        public void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer)
+        {
+        }
+
+        public void SetNonTerminalParsingRuleBody(IDictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies)
         {
             // Nothing to do here - terminals do not contain non-terminals.
         }

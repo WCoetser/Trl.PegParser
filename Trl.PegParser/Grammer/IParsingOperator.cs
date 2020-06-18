@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Trl.PegParser.DataStructures;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer
 {
-    public interface IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>
+    public interface IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>
         where TTokenTypeName : Enum
-        where TNoneTerminalName : Enum
+        where TNonTerminalName : Enum
     {
         /// <summary>
         /// This methed is used to execute the actual parsing of the input tokens and to execute semantic actions.
@@ -23,7 +24,7 @@ namespace Trl.PegParser.Grammer
         /// </summary>
         /// <param name="ruleBodies">Rules making up the parser, grouped by thier non-terminal head symbols.</param>
         void SetNonTerminalParsingRuleBody(
-            IDictionary<TNoneTerminalName, IParsingOperator<TTokenTypeName, TNoneTerminalName, TActionResult>> ruleBodies);
+            IDictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies);
 
         /// <summary>
         /// This is used to recursively walk through the expression tree of this operator to see if any non-terminals
@@ -35,6 +36,12 @@ namespace Trl.PegParser.Grammer
         /// <summary>
         /// Used for validations - all non-terminals must have corresponding parsing rules.
         /// </summary>
-        IEnumerable<TNoneTerminalName> GetNonTerminalNames();
+        IEnumerable<TNonTerminalName> GetNonTerminalNames();
+
+        /// <summary>
+        /// Memoizer used to avoid exponential parse time for grammers with multiple left-recursive nonterminals
+        /// in choice operators.
+        /// </summary>
+        void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer);
     }
 }
