@@ -96,10 +96,10 @@ namespace Trl.PegParser.Grammer
         public ParseResult<TTokenTypeName, TSemanticActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens)
         {
             _ = inputTokens ?? throw new ArgumentNullException(nameof(inputTokens));
+            
+            var parseResult = _startSymbol.Parse(inputTokens, 0, true);
 
             _memoizer.ClearAll();
-
-            var parseResult = _startSymbol.Parse(inputTokens, 0, true);
 
             // Test for extra input at end of input
             if (parseResult.Succeed && parseResult.NextParseStartIndex != inputTokens.Count)

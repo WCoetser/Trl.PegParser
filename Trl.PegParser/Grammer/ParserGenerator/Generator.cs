@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Trl.PegParser.Grammer.Operators;
+using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tokenization;
 
 namespace Trl.PegParser.Grammer.ParserGenerator
@@ -30,10 +30,158 @@ namespace Trl.PegParser.Grammer.ParserGenerator
 
         private void BuildSemantics()
         {
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Start,
-                (_, _subresults) => new RuleCollectionResult<TTokenTypeName, TNonTerminalName, TActionResult>
+            var actions = _inputPeg.DefaultSemanticActions;
+
+            actions.SetDefaultGenericPassthroughAction<GenericAstResult>();
+
+            actions.OrderedChoiceAction = (_, subResults) => subResults.First();
+
+            actions.SetNonTerminalAction(RuleName.Operator, (_, subResults) => subResults.First());
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Start, (_, subResults) =>
+            {
+                var oneOrMore = ((GenericAstResult)subResults.First()).SubResults.Cast<RuleAstResult<TTokenTypeName, TNonTerminalName, TActionResult>>();
+                var ruleCollectionResult = new RuleCollectionResult<TTokenTypeName, TNonTerminalName, TActionResult>();
+                ruleCollectionResult.Rules = oneOrMore.Select(ruleAstResult => _outputPeg.Rule(ruleAstResult.RuleName, ruleAstResult.Operator));
+                return ruleCollectionResult;
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Rule, (_, subResults) =>
+            {
+                var resultsArray = ((GenericAstResult)subResults.First()).SubResults;
+                var resultNonTermnial = (GenericAstResult)resultsArray[0];
+                var nonTerminalName = resultNonTermnial.MatchedTokens.GetMatchedString();
+                if (!Enum.TryParse(typeof(TNonTerminalName), nonTerminalName, out object nameObj))
                 {
-                    Rules = Enumerable.Empty<ParsingRule<TTokenTypeName, TNonTerminalName, TActionResult>>()
+                    throw new Exception($"Invalid nonterminal name given: {nonTerminalName} is undeclared in {nameof(TNonTerminalName)}");
+                }
+                TNonTerminalName name = (TNonTerminalName)nameObj;
+                return new RuleAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+
+                    RuleName = name,
+                    Operator = ((OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>)resultsArray[2]).Operator
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.NonTerminal,
+                (_, subresults) =>
+                {
+                    var result = (GenericAstResult)subresults.First();
+                    var nonTerminalName = result.MatchedTokens.GetMatchedString();
+
+                    if (!Enum.TryParse(typeof(TNonTerminalName), nonTerminalName, out object nameObj))
+                    {
+                        throw new Exception($"Invalid nonterminal name given: {nonTerminalName} is undeclared in {nameof(TNonTerminalName)}");
+                    }
+                    TNonTerminalName name = (TNonTerminalName)nameObj;
+                    return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                    {
+                        Operator = _outputPeg.Operators.NonTerminal(name)
+                    };
+                });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Empty,
+                (_, subresults) =>
+                {
+                    return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                    {
+                        Operator = _outputPeg.Operators.EmptyString()
+                    };
+                });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Brackets, (_, subResults) =>
+            {
+                return ((GenericAstResult)(subResults.First())).SubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.And, (_, subResults) =>
+            {
+                var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.AndPredicate(op.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Not, (_, subResults) =>
+            {
+                var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.NotPredicate(op.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.OneOrMore, (_, subResults) =>
+            {
+                var firstSubExpression = (GenericAstResult)subResults.First();
+                var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.OneOrMore(subExpression.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.ZeroOrMore, (_, subResults) =>
+            {
+                var firstSubExpression = (GenericAstResult)subResults.First();
+                var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.ZeroOrMore(subExpression.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Optional, (_, subResults) =>
+            {
+                var firstSubExpression = (GenericAstResult)subResults.First();
+                var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.Optional(subExpression.Operator)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Terminal,
+            (_, subresults) =>
+            {
+                var result = (GenericAstResult)subresults.First();
+                var terminalName = ((GenericAstResult)result.SubResults[1]).MatchedTokens.GetMatchedString();
+
+                if (!Enum.TryParse(typeof(TTokenTypeName), terminalName, out object nameObj))
+                {
+                    throw new Exception($"Invalid nonterminal name given: {terminalName} is undeclared in {nameof(TTokenTypeName)}");
+                }
+                TTokenTypeName name = (TTokenTypeName)nameObj;
+                return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                {
+                    Operator = _outputPeg.Operators.Terminal(name)
+                };
+            });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Sequence,
+                (_, subResults) =>
+                {
+                    var subSubResults = ((GenericAstResult)subResults.First()).SubResults;
+                    var head = subSubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                    var tail = subSubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                    return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                    {
+                        Operator = _outputPeg.Operators.Sequence(head.Operator, tail.Operator)
+                    };
+                });
+
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Choice,
+                (_, subResults) =>
+                {
+                    var subSubResults = ((GenericAstResult)subResults.First()).SubResults;
+                    var head = subSubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                    var tail = subSubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
+                    return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
+                    {
+                        Operator = _outputPeg.Operators.OrderedChoice(head.Operator, tail.Operator)
+                    };
                 });
         }
 
@@ -62,16 +210,16 @@ namespace Trl.PegParser.Grammer.ParserGenerator
             var op = _inputPeg.Operators;
 
             var start = _inputPeg.Rule(RuleName.Start, 
-                op.OneOrMore(
-                    op.Sequence(op.NonTerminal(RuleName.Rule),
-                                op.Optional(op.Terminal(TokenNames.SemiColon)))));
+                op.OneOrMore(op.NonTerminal(RuleName.Rule)));
 
             var rule = _inputPeg.Rule(RuleName.Rule,
                op.Sequence(op.Terminal(TokenNames.Identifier),
                            op.Terminal(TokenNames.Arrow),
-                           op.NonTerminal(RuleName.Operator)));
+                           op.NonTerminal(RuleName.Operator),
+                           op.Optional(op.Terminal(TokenNames.SemiColon))));
 
             var @operator = _inputPeg.Rule(RuleName.Operator,
+               // NB: Order matters here
                op.OrderedChoice(op.NonTerminal(RuleName.Choice),
                                 op.NonTerminal(RuleName.Sequence),
                                 op.NonTerminal(RuleName.Optional),
