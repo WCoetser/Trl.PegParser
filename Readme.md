@@ -181,6 +181,23 @@ defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchR
 });
 ```
 
+# Debugging semantic functions
+
+When implementing semantic functions and using `SetDefaultGenericPassthroughAction`, it is possible to get lost in the generated parse output tree. In order to mitigate this, `MatchedPeg` was added to the base class for the generic argument. It is also passed to the semantic function for simpler parsing scenarios.
+
+For example, in the following code `matchedPeg` contains the specification of the matched PEG. `IAstResult` is an interface for marking the parse results. `GenericPassthroughAst` implements `IAstResult` and inherits from `GenericPassthroughResult` which has the member `MatchedPeg`.
+
+```C#
+var peg = new PegFacade<TokenNames, ParsingRuleNames, IAstResult>();
+string matchedSpec = null;
+peg.DefaultSemanticActions.SetDefaultGenericPassthroughAction<GenericPassthroughAst>();
+peg.DefaultSemanticActions.OrderedChoiceAction = (_, subResults, matchedPeg) =>
+{
+    matchedSpec = matchedPeg;
+    return subResults.First();
+};
+```
+
 # Installation via Nuget
 
 See [https://www.nuget.org/packages/Trl.PegParser/](https://www.nuget.org/packages/Trl.PegParser/) for nuget package.
