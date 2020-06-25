@@ -14,7 +14,7 @@ namespace Trl.PegParser.Tests
         public EmptyStringTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.EmptyStringAction = (tokensMatch, subResults) =>
+            semanticActions.EmptyStringAction = (tokensMatch, subResults, matchedPeg) =>
             {
                 // Extract string result of matching the Terminal symbol
                 subActionResults = subResults;

@@ -17,5 +17,6 @@ namespace Trl.PegParser.Grammer.Semantics
     {
         public TokensMatch<TTokenTypeName> MatchedTokens { get; set; }
         public IReadOnlyList<TActionResult> SubResults { get; set; }
+        public string MatchedPeg { get; set; }
     }
 }

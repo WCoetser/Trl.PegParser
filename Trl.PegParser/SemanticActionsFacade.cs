@@ -32,9 +32,16 @@ namespace Trl.PegParser
         public void SetDefaultGenericPassthroughAction<TGenericResult>()
             where TGenericResult : GenericPassthroughResult<TActionResult, TTokenTypeName>, TActionResult, new()
         {
-            _passthroughFunction = (tokensMatch, subResults) => new TGenericResult { MatchedTokens = tokensMatch, SubResults = subResults.ToList().AsReadOnly() };
+            _passthroughFunction = 
+                (tokensMatch, subResults, matchedPeg) => 
+                    new TGenericResult 
+                    { 
+                        MatchedTokens = tokensMatch, 
+                        SubResults = subResults.ToList().AsReadOnly(),
+                        MatchedPeg = matchedPeg
+                    };
         }
-
+        
         public SemanticAction<TActionResult, TTokenTypeName> SequenceAction
         {
             get => _sequenceAction ?? _passthroughFunction;

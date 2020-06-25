@@ -13,7 +13,7 @@ namespace Trl.PegParser.Tests
         public TerminalTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            var extractValue = semanticActions.SemanticAction((tokensMatch, subResults) =>
+            var extractValue = semanticActions.SemanticAction((tokensMatch, subResults, matchedPeg) =>
             {
                 // Extract string result of matching the Terminal symbol
                 subActionResults = subResults;

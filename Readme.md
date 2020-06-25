@@ -92,10 +92,10 @@ Semantic actions are assigned per parsing operator:
 var semanticActions = peg.DefaultSemanticActions;
 
 semanticActions.OrderedChoiceAction =
-    (matchedTokens, subresults) => subresults.First();
+    (matchedTokens, subresults, matchedPeg) => subresults.First();
 
 semanticActions.SequenceAction =
-    (matchedTokens, subresults) =>
+    (matchedTokens, subresults, matchedPeg) =>
     {
         return subresults.Where(s => s.HasValue).Sum(s => s.Value);
     };
@@ -105,10 +105,10 @@ It is also possible to define actions per terminal and non-terminal symbol name.
 
 ```C
 semanticActions.SetTerminalAction(Tokens.Number,
-    (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));
+    (matchedTokens, subresults, matchedPeg) => double.Parse(matchedTokens.GetMatchedString()));
 
 semanticActions.SetNonTerminalAction(RuleNames.Add,
-    (matchedTokens, subresults) => subresults.First());
+    (matchedTokens, subresults, matchedPeg) => subresults.First());
 ```
 
 The second argument for semantic actions, `subresults`, is of type `IEnumerable`. This is to accomodate scenarios where there may be more than one sub result, for example when the _Sequence_ or _One or More_ operator matched a sequence of substring.

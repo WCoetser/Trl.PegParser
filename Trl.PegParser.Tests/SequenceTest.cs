@@ -16,10 +16,10 @@ namespace Trl.PegParser.Tests
         public SequenceTest()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            var extractValueTerminal = semanticActions.SemanticAction((matchedTokenRange, _) => matchedTokenRange.GetMatchedString());
+            var extractValueTerminal = semanticActions.SemanticAction((matchedTokenRange, _, matchedPeg) => matchedTokenRange.GetMatchedString());
             semanticActions.SetTerminalAction(TokenNames.A, extractValueTerminal);
             semanticActions.SetTerminalAction(TokenNames.B, extractValueTerminal);
-            semanticActions.SequenceAction = (matchedTokenRange, subResults) =>
+            semanticActions.SequenceAction = (matchedTokenRange, subResults, matchedPeg) =>
             {
                 // Extract string result of matching the Terminal symbol
                 matchedTokenRangeAssert = matchedTokenRange;

@@ -11,7 +11,7 @@ namespace Trl.PegParser.Tests
         public NotPredicateTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.SetTerminalAction(TokenNames.A, (match, _) => match.GetMatchedString());
+            semanticActions.SetTerminalAction(TokenNames.A, (match, _, matchedPeg) => match.GetMatchedString());
         }
 
         [Fact]

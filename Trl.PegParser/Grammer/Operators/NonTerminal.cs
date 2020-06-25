@@ -17,7 +17,7 @@ namespace Trl.PegParser.Grammer.Operators
         where TTokenTypeName : Enum
         where TNonTerminalName : Enum
     {
-        private readonly TNonTerminalName _noneTerminalName;
+        private readonly TNonTerminalName _nonTerminalName;
         private IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult> _ruleBody;
         private readonly SemanticAction<TActionResult, TTokenTypeName> _matchAction;
         private Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> _memoizer;
@@ -27,11 +27,11 @@ namespace Trl.PegParser.Grammer.Operators
         /// </summary>
         private readonly HashSet<int> _previousStartIndices;
 
-        public NonTerminal(TNonTerminalName noneTerminalName, SemanticAction<TActionResult, TTokenTypeName> matchAction)
-            => (_noneTerminalName, _matchAction, _previousStartIndices) = (noneTerminalName, matchAction, new HashSet<int>());
+        public NonTerminal(TNonTerminalName nonTerminalName, SemanticAction<TActionResult, TTokenTypeName> matchAction)
+            => (_nonTerminalName, _matchAction, _previousStartIndices) = (nonTerminalName, matchAction, new HashSet<int>());
 
         public IEnumerable<TNonTerminalName> GetNonTerminalNames()
-            => new[] { _noneTerminalName };
+            => new[] { _nonTerminalName };
                 
         public void SetNonTerminalParsingRuleBody(
             IDictionary<TNonTerminalName, IParsingOperator<TTokenTypeName, TNonTerminalName, TActionResult>> ruleBodies)
@@ -41,7 +41,7 @@ namespace Trl.PegParser.Grammer.Operators
                 throw new ArgumentNullException(nameof(ruleBodies));
             }
 
-            _ruleBody = ruleBodies[_noneTerminalName];
+            _ruleBody = ruleBodies[_nonTerminalName];
         }
 
         public bool HasNonTerminalParsingRuleBodies => _ruleBody != null;
@@ -53,7 +53,7 @@ namespace Trl.PegParser.Grammer.Operators
 
         public ParseResult<TTokenTypeName, TActionResult> Parse(IReadOnlyList<TokenMatch<TTokenTypeName>> inputTokens, int startIndex, bool mustConsumeTokens)
         {
-            var currentInputs = (_noneTerminalName, startIndex, mustConsumeTokens);
+            var currentInputs = (_nonTerminalName, startIndex, mustConsumeTokens);
             var knownOutput = _memoizer.GetOutput(currentInputs);
             if (knownOutput != default)
             {
@@ -82,7 +82,7 @@ namespace Trl.PegParser.Grammer.Operators
             {
                 if (_matchAction != null && mustConsumeTokens)
                 {
-                    semanticActionResult = _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult });
+                    semanticActionResult = _matchAction(parseResult.MatchedTokens, new[] { parseResult.SemanticActionResult }, ToParserSpec.Value);
                 }
                 returnResult = ParseResult<TTokenTypeName, TActionResult>.Succeeded(parseResult.NextParseStartIndex, parseResult.MatchedTokens, semanticActionResult);
             }
@@ -95,6 +95,8 @@ namespace Trl.PegParser.Grammer.Operators
             return returnResult;
         }
 
-        public override string ToString() => _noneTerminalName.ToString();
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(() => _nonTerminalName.ToString());
     }
 }

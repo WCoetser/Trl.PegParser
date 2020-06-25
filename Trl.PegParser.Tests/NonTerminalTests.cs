@@ -14,8 +14,8 @@ namespace Trl.PegParser.Tests
         public NonTerminalTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.SetTerminalAction(TokenNames.A, (matchedTokens, _) => matchedTokens.GetMatchedString());
-            semanticActions.SetNonTerminalAction(ParsingRuleNames.NonTerminalA, (matchedTokens, subResults) =>
+            semanticActions.SetTerminalAction(TokenNames.A, (matchedTokens, _, matchedPeg) => matchedTokens.GetMatchedString());
+            semanticActions.SetNonTerminalAction(ParsingRuleNames.NonTerminalA, (matchedTokens, subResults, matchedPeg) =>
             {
                 _subResults = subResults.ToList();
                 return subResults.First();

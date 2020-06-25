@@ -34,11 +34,11 @@ namespace Trl.PegParser.Grammer.ParserGenerator
 
             actions.SetDefaultGenericPassthroughAction<GenericAstResult>();
 
-            actions.OrderedChoiceAction = (_, subResults) => subResults.First();
+            actions.OrderedChoiceAction = (_, subResults, matchedPeg) => subResults.First();
 
-            actions.SetNonTerminalAction(RuleName.Operator, (_, subResults) => subResults.First());
+            actions.SetNonTerminalAction(RuleName.Operator, (_, subResults, matchedPeg) => subResults.First());
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Start, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Start, (_, subResults, matchedPeg) =>
             {
                 var oneOrMore = ((GenericAstResult)subResults.First()).SubResults.Cast<RuleAstResult<TTokenTypeName, TNonTerminalName, TActionResult>>();
                 var ruleCollectionResult = new RuleCollectionResult<TTokenTypeName, TNonTerminalName, TActionResult>();
@@ -46,7 +46,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 return ruleCollectionResult;
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Rule, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Rule, (_, subResults, matchedPeg) =>
             {
                 var resultsArray = ((GenericAstResult)subResults.First()).SubResults;
                 var resultNonTermnial = (GenericAstResult)resultsArray[0];
@@ -65,7 +65,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
             });
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.NonTerminal,
-                (_, subresults) =>
+                (_, subresults, matchedPeg) =>
                 {
                     var result = (GenericAstResult)subresults.First();
                     var nonTerminalName = result.MatchedTokens.GetMatchedString();
@@ -82,7 +82,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 });
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Empty,
-                (_, subresults) =>
+                (_, subresults, matchedPeg) =>
                 {
                     return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
                     {
@@ -90,12 +90,12 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                     };
                 });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Brackets, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Brackets, (_, subResults, matchedPeg) =>
             {
                 return ((GenericAstResult)(subResults.First())).SubResults[1] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.And, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.And, (_, subResults, matchedPeg) =>
             {
                 var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
                 return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
@@ -104,7 +104,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 };
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Not, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Not, (_, subResults, matchedPeg) =>
             {
                 var op = ((GenericAstResult)subResults.First()).SubResults[2] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
                 return new OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>
@@ -113,7 +113,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 };
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.OneOrMore, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.OneOrMore, (_, subResults, matchedPeg) =>
             {
                 var firstSubExpression = (GenericAstResult)subResults.First();
                 var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
@@ -123,7 +123,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 };
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.ZeroOrMore, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.ZeroOrMore, (_, subResults, matchedPeg) =>
             {
                 var firstSubExpression = (GenericAstResult)subResults.First();
                 var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
@@ -133,7 +133,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 };
             });
 
-            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Optional, (_, subResults) =>
+            _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Optional, (_, subResults, matchedPeg) =>
             {
                 var firstSubExpression = (GenericAstResult)subResults.First();
                 var subExpression = firstSubExpression.SubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
@@ -144,7 +144,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
             });
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Terminal,
-            (_, subresults) =>
+            (_, subresults, matchedPeg) =>
             {
                 var result = (GenericAstResult)subresults.First();
                 var terminalName = ((GenericAstResult)result.SubResults[1]).MatchedTokens.GetMatchedString();
@@ -161,7 +161,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
             });
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Sequence,
-                (_, subResults) =>
+                (_, subResults, matchedPeg) =>
                 {
                     var subSubResults = ((GenericAstResult)subResults.First()).SubResults;
                     var head = subSubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;
@@ -173,7 +173,7 @@ namespace Trl.PegParser.Grammer.ParserGenerator
                 });
 
             _inputPeg.DefaultSemanticActions.SetNonTerminalAction(RuleName.Choice,
-                (_, subResults) =>
+                (_, subResults, matchedPeg) =>
                 {
                     var subSubResults = ((GenericAstResult)subResults.First()).SubResults;
                     var head = subSubResults[0] as OperatorAstResult<TTokenTypeName, TNonTerminalName, TActionResult>;

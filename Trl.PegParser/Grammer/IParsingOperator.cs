@@ -43,5 +43,12 @@ namespace Trl.PegParser.Grammer
         /// in choice operators.
         /// </summary>
         void SetMemoizer(Memoizer<(TNonTerminalName, int, bool), ParseResult<TTokenTypeName, TActionResult>> memoizer);
+
+        /// <summary>
+        /// Gets the parser generator representation of this operator.
+        /// This is lazy loaded to avoid repeatedly traversing the PEG tree representation
+        /// while passing the spec to the semantic function to indicate what has been parsed.
+        /// </summary>
+        Lazy<string> ToParserSpec { get; }
     }
 }

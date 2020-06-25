@@ -39,7 +39,7 @@ namespace Trl.PegParser.Grammer.Operators
             if (_matchAction != null && mustConsumeTokens)
             {
                 // Terminals cannot have sub-results, therefore pass null
-                actionResult = _matchAction(match, Enumerable.Empty<TActionResult>());
+                actionResult = _matchAction(match, Enumerable.Empty<TActionResult>(), ToParserSpec.Value);
             }
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, match, actionResult);
         }
@@ -55,6 +55,9 @@ namespace Trl.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies => false;
 
-        public override string ToString() => "[]";
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(() => "[]");
+
     }
 }

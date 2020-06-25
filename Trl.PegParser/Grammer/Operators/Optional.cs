@@ -33,7 +33,7 @@ namespace Trl.PegParser.Grammer.Operators
             {
                 if (_matchAction != null && mustConsumeTokens)
                 {
-                    semanticResult = _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult });
+                    semanticResult = _matchAction(result.MatchedTokens, new[] { result.SemanticActionResult }, ToParserSpec.Value);
                 }
                 return ParseResult<TTokenTypeName, TActionResult>.Succeeded(result.NextParseStartIndex, result.MatchedTokens, semanticResult);
             };
@@ -46,7 +46,7 @@ namespace Trl.PegParser.Grammer.Operators
             var matchedTokens = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 0));
             if (_matchAction != null && mustConsumeTokens)
             {
-                semanticResult = _matchAction(matchedTokens, Enumerable.Empty<TActionResult>());
+                semanticResult = _matchAction(matchedTokens, Enumerable.Empty<TActionResult>(), ToParserSpec.Value);
             }
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex, matchedTokens, semanticResult);
         }
@@ -65,6 +65,8 @@ namespace Trl.PegParser.Grammer.Operators
         public bool HasNonTerminalParsingRuleBodies
             => _subExpression.HasNonTerminalParsingRuleBodies;
 
-        public override string ToString() => $"({_subExpression})?";
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(() => $"({_subExpression})?");
     }
 }

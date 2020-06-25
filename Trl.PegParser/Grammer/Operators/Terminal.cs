@@ -38,7 +38,7 @@ namespace Trl.PegParser.Grammer.Operators
             var match = new TokensMatch<TTokenTypeName>(inputTokens, new MatchRange(startIndex, 1));
             if (_matchAction != null && mustConsumeTokens)
             {
-                actionResult = _matchAction(match, Enumerable.Empty<TActionResult>());
+                actionResult = _matchAction(match, Enumerable.Empty<TActionResult>(), ToParserSpec.Value);
             }
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(startIndex + 1, match, actionResult);
         }
@@ -57,6 +57,8 @@ namespace Trl.PegParser.Grammer.Operators
         /// </summary>
         public bool HasNonTerminalParsingRuleBodies => false;
 
-        public override string ToString() => $"[{_expectedToken}]";
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(() => $"[{_expectedToken}]");
     }
 }

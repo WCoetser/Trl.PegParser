@@ -44,6 +44,8 @@ namespace Trl.PegParser.Grammer.Operators
 
         public bool HasNonTerminalParsingRuleBodies => _subExpression.HasNonTerminalParsingRuleBodies;
 
-        public override string ToString() => $"!({_subExpression})";
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(() => $"!({_subExpression})");
     }
 }

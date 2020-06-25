@@ -49,7 +49,7 @@ namespace Trl.PegParser.Grammer.Operators
             TActionResult actionResult = default;
             if (_matchAction != null && mustConsumeTokens)
             {
-                actionResult = _matchAction(lastResult.MatchedTokens, new[] { lastResult.SemanticActionResult });
+                actionResult = _matchAction(lastResult.MatchedTokens, new[] { lastResult.SemanticActionResult }, ToParserSpec.Value);
             }
             return ParseResult<TTokenTypeName, TActionResult>.Succeeded(lastResult.NextParseStartIndex, lastResult.MatchedTokens, actionResult);
         }
@@ -73,6 +73,9 @@ namespace Trl.PegParser.Grammer.Operators
         public bool HasNonTerminalParsingRuleBodies
             => _choiceSubExpressions.Any(e => e.HasNonTerminalParsingRuleBodies);
 
-        public override string ToString() => $"({ string.Join(" | ", _choiceSubExpressions.Select(s => s.ToString())) })";
+        public override string ToString() => ToParserSpec.Value;
+
+        public Lazy<string> ToParserSpec => new Lazy<string>(
+            () => $"({ string.Join(" | ", _choiceSubExpressions.Select(s => s.ToString())) })");
     }
 }

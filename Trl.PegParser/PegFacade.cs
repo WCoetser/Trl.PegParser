@@ -46,7 +46,7 @@ namespace Trl.PegParser
             var semanticAction = DefaultSemanticActions.GetNonTerminalAction(startSymbol);
             if (semanticAction == default)
             {
-                semanticAction = DefaultSemanticActions.SemanticAction((_, subResults) => subResults.FirstOrDefault());
+                semanticAction = DefaultSemanticActions.SemanticAction((_, subResults, matchedPeg) => subResults.FirstOrDefault());
             }
             return new Parser<TTokenTypeName, TNonTerminalName, TActionResult>(Operators.NonTerminal(startSymbol, semanticAction), grammerRules);
         }

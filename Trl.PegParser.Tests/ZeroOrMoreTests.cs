@@ -16,15 +16,15 @@ namespace Trl.PegParser.Tests
         public ZeroOrMoreTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.ZeroOrMoreAction = (tokensMatch, subResults) =>
+            semanticActions.ZeroOrMoreAction = (tokensMatch, subResults, matchedPeg) =>
             {
                 matchedTokens = tokensMatch;
                 subActionResults = subResults;
                 return tokensMatch.GetMatchedString();
             };
-            semanticActions.SetTerminalAction(TokenNames.A, (match, _) => match.GetMatchedString());
-            semanticActions.SetTerminalAction(TokenNames.B, (match, _) => match.GetMatchedString());
-            semanticActions.OrderedChoiceAction = (_, subResults) => subResults.Single();
+            semanticActions.SetTerminalAction(TokenNames.A, (match, _, matchedPeg) => match.GetMatchedString());
+            semanticActions.SetTerminalAction(TokenNames.B, (match, _, matchedPeg) => match.GetMatchedString());
+            semanticActions.OrderedChoiceAction = (_, subResults, matchedPeg) => subResults.Single();
         }
 
         [Fact]

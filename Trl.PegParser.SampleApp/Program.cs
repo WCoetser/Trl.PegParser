@@ -64,12 +64,12 @@ namespace Trl.PegParser.SampleApp
         private static void DefineSemanticActions(PegFacade<Tokens, RuleNames, double?> peg)
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.OrderedChoiceAction = (matchedTokens, subresults) => subresults.First();
+            semanticActions.OrderedChoiceAction = (matchedTokens, subresults, matchedPeg) => subresults.First();
             semanticActions.SetTerminalAction(Tokens.Number,
-                (matchedTokens, subresults) => double.Parse(matchedTokens.GetMatchedString()));            
+                (matchedTokens, subresults, matchedPeg) => double.Parse(matchedTokens.GetMatchedString()));            
             semanticActions.SetNonTerminalAction(RuleNames.Add,
-                (matchedTokens, subresults) => subresults.First());
-            semanticActions.SequenceAction = (matchedTokens, subresults) =>
+                (matchedTokens, subresults, matchedPeg) => subresults.First());
+            semanticActions.SequenceAction = (matchedTokens, subresults, matchedPeg) =>
             {
                 // "+" will return a sub result of null because if does not have an
                 // action associated with the Plus token via a SetTerminalAction call

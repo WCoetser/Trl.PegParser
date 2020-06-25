@@ -14,6 +14,6 @@ namespace Trl.PegParser.Grammer.Semantics
     /// <param name="matchedTokens">Represents the tokens that were matched</param>
     /// <returns>Results that can be used in parent semantic actions.</returns>
     public delegate TActionResult SemanticAction<TActionResult, TTokenTypeName>(TokensMatch<TTokenTypeName> matchedTokens, 
-        IEnumerable<TActionResult> subActionResults)
+        IEnumerable<TActionResult> subActionResults, string matchedPegOperators)
         where TTokenTypeName: Enum;
 }

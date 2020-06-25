@@ -14,7 +14,7 @@ namespace Trl.PegParser.Tests
         public OrderedChoiceTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.OrderedChoiceAction = (matchedTokens, subResults) => {
+            semanticActions.OrderedChoiceAction = (matchedTokens, subResults, matchedPeg) => {
                 this.matchedTokens = matchedTokens;
                 return subResults.First();
             };
@@ -26,7 +26,7 @@ namespace Trl.PegParser.Tests
             // Arrange
             string input = "bbb";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.B, (m, _) => m.GetMatchedString());
+            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.B, (m, _, matchedPeg) => m.GetMatchedString());
             var rules = peg.ParserGenerator.GetParsingRules("Start => [A] | [B]");
             var parser = peg.Parser(ParsingRuleNames.Start, rules);
 
@@ -47,7 +47,7 @@ namespace Trl.PegParser.Tests
             // Arrange
             string input = "aaa";
             var tokenizer = peg.Tokenizer(TokenDefinitions.AB);
-            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.A, (m, _) => m.GetMatchedString());
+            peg.DefaultSemanticActions.SetTerminalAction(TokenNames.A, (m, _, matchedPeg) => m.GetMatchedString());
             var rules = peg.ParserGenerator.GetParsingRules("Start => [A] | [B]");
             var parser = peg.Parser(ParsingRuleNames.Start, rules);
 

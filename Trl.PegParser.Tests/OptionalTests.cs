@@ -15,8 +15,8 @@ namespace Trl.PegParser.Tests
         public OptionalTests()
         {
             var semanticActions = peg.DefaultSemanticActions;
-            semanticActions.SetTerminalAction(TokenNames.A, (tokens, _) => tokens.GetMatchedString());
-            semanticActions.OptionalAction = (matchedTokenRange, subResults) =>
+            semanticActions.SetTerminalAction(TokenNames.A, (tokens, _, matchedPeg) => tokens.GetMatchedString());
+            semanticActions.OptionalAction = (matchedTokenRange, subResults, matchedPeg) =>
             {
                 matchedTokenRangeAssert = matchedTokenRange;
                 subActionResults = subResults;
