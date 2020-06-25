@@ -171,7 +171,7 @@ All operators created after this method call will use the passthrough function a
 After this `SetTerminalAction` and `SetNonTerminalAction` can be used to set semantic actions for specific terminals and non-terminals. For example, when parsing a binary operator, it should be possible to write something like this:
 
 ```C#
-defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchResult, subActionResults) =>
+defaultSemantics.SetNonTerminalAction(ParsingRuleNames.BinaryExpression, (matchResult, subActionResults, matchedPeg) =>
 {
     var subResultsList = subActionResults.ToList();
     var op = (GenericResult)subResultsList[1];
