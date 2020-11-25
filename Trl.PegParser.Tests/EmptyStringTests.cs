@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -64,6 +65,8 @@ namespace Trl.PegParser.Tests
             var subResults = result.SubResults.Cast<GenericPassthroughAst>().First().SubResults.Cast<GenericPassthroughAst>().ToList();
             Assert.Equal(string.Empty, result.MatchedTokens.GetMatchedString());
             Assert.Empty(subResults);
+            Assert.Equal(MatchedPegOperator.NonTerminal, result.MatchedOperator);
+            Assert.Equal(MatchedPegOperator.EmptyString, result.SubResults.Cast<GenericPassthroughAst>().Single().MatchedOperator);
         }
     }
 }

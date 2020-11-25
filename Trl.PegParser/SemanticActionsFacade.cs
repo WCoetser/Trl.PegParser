@@ -14,7 +14,8 @@ namespace Trl.PegParser
 
         private readonly Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>> _actionByNonTerminal;
 
-        private SemanticAction<TActionResult, TTokenTypeName> _passthroughFunction;
+        private Func<MatchedPegOperator, SemanticAction<TActionResult, TTokenTypeName>> _passthroughFunctionConstructor;
+
         private SemanticAction<TActionResult, TTokenTypeName> _sequenceAction;
         private SemanticAction<TActionResult, TTokenTypeName> _emptyStringAction;
         private SemanticAction<TActionResult, TTokenTypeName> _optionalAction;
@@ -26,55 +27,58 @@ namespace Trl.PegParser
         {
             _actionByTerminalToken = new Dictionary<TTokenTypeName, SemanticAction<TActionResult, TTokenTypeName>>();
             _actionByNonTerminal = new Dictionary<TNonTerminalName, SemanticAction<TActionResult, TTokenTypeName>>();
-            _passthroughFunction = null;
+            _passthroughFunctionConstructor = null;
         }
 
         public void SetDefaultGenericPassthroughAction<TGenericResult>()
             where TGenericResult : GenericPassthroughResult<TActionResult, TTokenTypeName>, TActionResult, new()
         {
-            _passthroughFunction = 
-                (tokensMatch, subResults, matchedPeg) => 
-                    new TGenericResult 
-                    { 
-                        MatchedTokens = tokensMatch, 
+            _passthroughFunctionConstructor = (operatorType) =>
+            {
+                return (tokensMatch, subResults, matchedPeg) =>
+                    new TGenericResult
+                    {
+                        MatchedTokens = tokensMatch,
                         SubResults = subResults.ToList().AsReadOnly(),
-                        MatchedPeg = matchedPeg
+                        MatchedPeg = matchedPeg,
+                        MatchedOperator = operatorType
                     };
+            };
         }
         
         public SemanticAction<TActionResult, TTokenTypeName> SequenceAction
         {
-            get => _sequenceAction ?? _passthroughFunction;
+            get => _sequenceAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.Sequence);
             set => _sequenceAction = value;
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> EmptyStringAction
         {
-            get => _emptyStringAction ?? _passthroughFunction;
+            get => _emptyStringAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.EmptyString);
             set => _emptyStringAction = value;
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> OptionalAction
         {
-            get => _optionalAction ?? _passthroughFunction;
+            get => _optionalAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.Optional);
             set => _optionalAction = value;
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> OrderedChoiceAction
         {
-            get => _orderedChoiceAction ?? _passthroughFunction;
+            get => _orderedChoiceAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.OrderedChoice);
             set => _orderedChoiceAction = value;
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> ZeroOrMoreAction
         {
-            get => _zeroOrMoreAction ?? _passthroughFunction;
+            get => _zeroOrMoreAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.ZeroOrMore);
             set => _zeroOrMoreAction = value;
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> OneOrMoreAction
         { 
-            get => _oneOrMoreAction ?? _passthroughFunction; 
+            get => _oneOrMoreAction ?? _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.OneOrMore);
             set => _oneOrMoreAction = value; 
         }
 
@@ -95,7 +99,12 @@ namespace Trl.PegParser
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> GetTerminalAction(TTokenTypeName tokenType)
-            => _actionByTerminalToken.TryGetValue(tokenType, out SemanticAction<TActionResult, TTokenTypeName> action) ? action : _passthroughFunction;
+        {
+            return _actionByTerminalToken.TryGetValue(tokenType, out SemanticAction<TActionResult, TTokenTypeName> action) switch {
+                true => action,
+                _ => _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.Terminal)
+            };
+        }
 
         public void SetNonTerminalAction(TNonTerminalName nonTerminalA, SemanticAction<TActionResult, TTokenTypeName> matchAction)
         {
@@ -107,6 +116,12 @@ namespace Trl.PegParser
         }
 
         public SemanticAction<TActionResult, TTokenTypeName> GetNonTerminalAction(TNonTerminalName nonTerminal)
-        => _actionByNonTerminal.TryGetValue(nonTerminal, out SemanticAction<TActionResult, TTokenTypeName> action) ? action : _passthroughFunction;
+        {
+            return _actionByNonTerminal.TryGetValue(nonTerminal, out SemanticAction<TActionResult, TTokenTypeName> action) switch
+            {
+                true => action,
+                _ => _passthroughFunctionConstructor?.Invoke(MatchedPegOperator.NonTerminal)
+            };
+        }
     }
 }

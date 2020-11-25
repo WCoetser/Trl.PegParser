@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Trl.PegParser.Grammer.Semantics;
 using Trl.PegParser.Tests.TestFixtures;
 using Xunit;
 
@@ -73,6 +74,7 @@ namespace Trl.PegParser.Tests
             var seqResults = subResults[1].SubResults.Cast<GenericPassthroughAst>().ToList();
             Assert.Equal("aaaa", seqResults[0].MatchedTokens.GetMatchedString());
             Assert.Equal("bbbb", seqResults[1].MatchedTokens.GetMatchedString());
+            Assert.Equal(MatchedPegOperator.NonTerminal, result.MatchedOperator);
         }
     }
 }
