@@ -4,6 +4,7 @@
     {
         A,
         B,
+        C,
         Empty,
         String,
         Identifier,

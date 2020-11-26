@@ -20,6 +20,13 @@ namespace Trl.PegParser.Tests.TestFixtures
             Peg.Facade().Token(TokenNames.B, new Regex("b+", RegexOptions.IgnoreCase))
         };
 
+        public static IEnumerable<TokenDefinition<TokenNames>> ABC => new[]
+{
+            Peg.Facade().Token(TokenNames.A, new Regex("A", RegexOptions.IgnoreCase)),
+            Peg.Facade().Token(TokenNames.B, new Regex("BB", RegexOptions.IgnoreCase)),
+            Peg.Facade().Token(TokenNames.C, new Regex("CCC", RegexOptions.IgnoreCase))
+        };
+
         public static IEnumerable<TokenDefinition<TokenNames>> JustA => new[]
         {
             Peg.Facade().Token(TokenNames.A, new Regex("a+", RegexOptions.IgnoreCase))

@@ -2,6 +2,7 @@ using Xunit;
 using Trl.PegParser.Tests.TestFixtures;
 using Trl.PegParser.Tokenization;
 using System;
+using System.Text;
 
 namespace Trl.PegParser.Tests
 {
@@ -112,6 +113,33 @@ namespace Trl.PegParser.Tests
             Assert.Equal(0, tokenizationResult.MatchedRanges.Count);
             Assert.Equal(1, tokenizationResult.UnmatchedRanges.Count);
             Assert.Equal(new MatchRange(0, 4), tokenizationResult.UnmatchedRanges[0]);
+        }
+
+        [Fact]
+        public void ShoudTokenizeEfficiently()
+        {
+            // Arrange
+            var tokenizer = new Tokenizer<TokenNames>(TokenDefinitions.ABC);
+            StringBuilder inputString = new StringBuilder();
+            var random = new Random(0); // note: random seed does not matter for this test
+            while (inputString.Length < 1_000_000)
+            {
+                var testVal = random.Next(4) switch
+                {
+                    0 => "A",
+                    1 => "BB",
+                    2 => "CCC",
+                    3 => "DDDD",
+                    4 => "F"
+                };
+                inputString.Append(testVal);
+            }
+
+            // Act
+            _ = tokenizer.Tokenize(inputString.ToString());
+
+            // Assert
+            Assert.True(true); // if it is inefficient it will time-out before getting to this point
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Trl.PegParser.Tokenization
 {
@@ -33,10 +32,10 @@ namespace Trl.PegParser.Tokenization
 
             var matches = GetMatches(inputString, prioritizedTokenDefinitions);
             var mismatches = GetMismatches(matches, inputString.Length);
-            return new TokenizationResult<TTokenName>(matches.Select(m => m.Value).ToList().AsReadOnly(), mismatches.AsReadOnly());
+            return new TokenizationResult<TTokenName>(matches.AsReadOnly(), mismatches.AsReadOnly());
         }
 
-        private List<MatchRange> GetMismatches(SortedDictionary<int, TokenMatch<TTokenName>> matches, int inputStringLength)
+        private List<MatchRange> GetMismatches(List<TokenMatch<TTokenName>> matches, int inputStringLength)
         {
             if (inputStringLength == 0)
             {
@@ -53,7 +52,7 @@ namespace Trl.PegParser.Tokenization
 
             var mismatches = new List<MatchRange>();
             int currentIndex = 0;
-            foreach (var match in matches.Select(m => m.Value))
+            foreach (var match in matches)
             {
                 if (match.MatchedCharacterRange.StartIndex != currentIndex)
                 {
@@ -72,38 +71,44 @@ namespace Trl.PegParser.Tokenization
             return mismatches;
         }
 
-        private SortedDictionary<int, TokenMatch<TTokenName>> GetMatches(string inputString, 
+        private List<TokenMatch<TTokenName>> GetMatches(string inputString, 
             IEnumerable<TokenDefinition<TTokenName>> prioritizedTokenDefinitions)
         {
-            var orderedMatches = new SortedDictionary<int, TokenMatch<TTokenName>>(); // mapping from match start index to match
-            foreach (var definition in prioritizedTokenDefinitions)
+            bool foundMatch = true;
+            var nextStartIndex = 0;
+            var matches = new List<TokenMatch<TTokenName>>();
+            var nextMatches = new List<TokenMatch<TTokenName>>(prioritizedTokenDefinitions.Count());
+
+            do
             {
-                var regexMatches = definition.DefiningRegex.Matches(inputString);
-                foreach (Match match in regexMatches)
+                foundMatch = false;
+                nextMatches.Clear();
+                foreach (var definition in prioritizedTokenDefinitions)
                 {
-                    // Contains check in case a higher priority regex/token def has been matched before this one
-                    if (match.Success && !Overlaps(orderedMatches, match))
+                    var match = definition.DefiningRegex.Match(inputString, nextStartIndex);
+                    if (match.Success)
                     {
                         var tokenMatch = new TokenMatch<TTokenName>(definition.Name,
-                            new MatchRange(match.Index, match.Length), inputString);
-                        orderedMatches.Add(match.Index, tokenMatch);
+                                new MatchRange(match.Index, match.Length), inputString);
+                        nextMatches.Add(tokenMatch);
                     }
                 }
-            }
-            return orderedMatches;
-        }
-
-
-        private bool Overlaps(SortedDictionary<int, TokenMatch<TTokenName>> existingRanges, Match testMatch)
-        {
-            foreach (var value in existingRanges.Select(pair => pair.Value))
-            {
-                if (value.MatchedCharacterRange.OverlapsWith(testMatch.Index, testMatch.Length))
+                if (nextMatches.Any())
                 {
-                    return true;
+                    var minStart = nextMatches.Min(m => m.MatchedCharacterRange.StartIndex);
+                    var bestMatch = nextMatches.First(nm => nm.MatchedCharacterRange.StartIndex == minStart);
+                    matches.Add(bestMatch);
+                    nextStartIndex = bestMatch.MatchedCharacterRange.Length switch
+                    {
+                        0 => bestMatch.MatchedCharacterRange.StartIndex + 1,
+                        _ => bestMatch.MatchedCharacterRange.StartIndex + bestMatch.MatchedCharacterRange.Length,
+                    };
+                    foundMatch = true;
                 }
             }
-            return false;
+            while (foundMatch && nextStartIndex < inputString.Length);
+
+            return matches;
         }
     }
 }
