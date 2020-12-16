@@ -1,6 +1,6 @@
 # Overview
 
-_Trl.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer. _Trl.PegParser_ is built on .NET Standard 2.1 for cross-platform compatibility.
+_Trl.PegParser_ contains a tokenizer and a parser. The tokenizer uses regular expressions to define tokens, and exposes both matched and unmatched character ranges. The PEG Parser uses parsing expression grammers with tokens produced by the tokenizer.
 
 _Trl.PegParser_ supports left recursion and contains safeguards against infinite loops in grammers due to cyclical non-terminal definitions.
 
